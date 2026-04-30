@@ -1,0 +1,50 @@
+{
+  "name": "rtl-text-tools",
+  "version": "0.1.0",
+  "description": "Complete text processing toolkit for RTL languages - fix ellipsis, punctuation, spacing, and more",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "rimraf dist && tsc",
+    "prepare": "npm run build"
+  },
+  "keywords": [
+    "rtl",
+    "ellipsis",
+    "arabic",
+    "hebrew",
+    "persian",
+    "urdu",
+    "text",
+    "fix",
+    "detect",
+    "punctuation",
+    "spacing",
+    "typescript",
+    "unicode"
+  ],
+  "author": {
+    "name": "Homayoun Mohammadi",
+    "email": "homayoun763@gmail.com",
+    "url": "https://github.com/homayounmmdy"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/homayounmmdy/rtl-text-tools.git"
+  },
+  "bugs": {
+    "url": "https://github.com/homayounmmdy/rtl-text-tools/issues"
+  },
+  "homepage": "https://github.com/homayounmmdy/rtl-text-tools#readme",
+  "devDependencies": {
+    "@types/node": "^25.3.2",
+    "rimraf": "^6.1.3",
+    "typescript": "^5.9.3"
+  },
+  "files": [
+    "dist/**/*",
+    "README.md",
+    "LICENSE"
+  ]
+}
