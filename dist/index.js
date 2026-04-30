@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.containsRTL = containsRTL;
 exports.fixRTLDots = fixRTLDots;
 /**
  * Detects if text contains RTL characters (Arabic, Hebrew, Persian, etc.)

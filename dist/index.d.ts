@@ -1,4 +1,8 @@
 /**
+ * Detects if text contains RTL characters (Arabic, Hebrew, Persian, etc.)
+ */
+export declare function containsRTL(text: string): boolean;
+/**
  * Moves ellipsis (...) to the beginning for RTL languages
  * Example: "مرحبا..." -> "...مرحبا"
  */
