@@ -7,6 +7,26 @@ export function containsRTL(text: string): boolean {
 }
 
 /**
+ * Converts LTR punctuation  to RTL equivalents
+ */
+export function toRTLPunctuation(text: string) : string{
+  if (!text || !containsRTL(text)) return text;
+
+  const punctuationsMap : Record<string , string> = {
+    '?': '؟',
+    ',': '،',
+    ';': '؛',
+  }
+  let result = text;
+  for (const [ltr , rtl] of Object.entries(punctuationsMap)) {
+    result = result.replace(ltr, rtl);
+  }
+
+
+  return result;
+}
+
+/**
  * Moves ellipsis (...) to the beginning for RTL languages
  * Example: "مرحبا..." -> "...مرحبا"
  */
