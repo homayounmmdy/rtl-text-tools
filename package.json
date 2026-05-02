@@ -1,6 +1,6 @@
 {
   "name": "rtl-text-tools",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Complete text processing toolkit for RTL languages - fix ellipsis, punctuation, spacing, and more",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

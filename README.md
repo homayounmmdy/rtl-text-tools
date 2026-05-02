@@ -3,15 +3,16 @@
 [![npm version](https://badge.fury.io/js/rtl-text-tools.svg)](https://www.npmjs.com/package/rtl-text-tools)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-A complete text processing toolkit for RTL (Right-to-Left) languages. Fix ellipsis, punctuation, spacing, and more for Arabic, Hebrew, Persian, Urdu, and other RTL scripts.
+A complete text processing toolkit for RTL (Right-to-Left) languages. Fix ellipsis, punctuation, digit conversion, and more for Arabic, Hebrew, Persian, Urdu, and other RTL scripts.
 
 ## 📜 Features
 
 - ✅ **RTL Detection** - Identify if text contains RTL characters
 - ✅ **Ellipsis Fixing** - Move ellipsis (...) to the proper position for RTL languages
-- 🚧 **Punctuation Handling** - Coming soon
-- 🚧 **Spacing Optimization** - Coming soon
-- 🚧 **Full Text Normalization** - Coming soon
+- ✅ **Punctuation Conversion** - Convert LTR punctuation to RTL equivalents
+- ✅ **Digit Conversion** - Convert Latin digits to Persian/Arabic digits
+- ✅ **Text Normalization** - Comprehensive RTL text processing
+
 
 ## 🚀 Installation
 
@@ -36,45 +37,36 @@ pnpm add rtl-text-tools
 ### Basic Example
 
 ```typescript
-import { containsRTL, fixRTLDots } from 'rtl-text-tools';
+import { hasRTL, moveEllipsis, convertPunctuation, toArabicDigits, toPersianDigits, fixRTL } from 'rtl-text-tools';
 
 // Check if text contains RTL characters
 const arabicText = "مرحبا بك";
-console.log(containsRTL(arabicText)); // true
+console.log(hasRTL(arabicText)); // true
 
 const englishText = "Hello World";
-console.log(containsRTL(englishText)); // false
+console.log(hasRTL(englishText)); // false
 
 // Fix ellipsis position for RTL text
 const textWithDots = "مرحبا...";
-console.log(fixRTLDots(textWithDots)); // "...مرحبا"
+console.log(moveEllipsis(textWithDots)); // "...مرحبا"
 
 // Non-RTL text remains unchanged
 const englishWithDots = "Hello...";
-console.log(fixRTLDots(englishWithDots)); // "Hello..."
+console.log(moveEllipsis(englishWithDots)); // "Hello..."
+
+// Convert punctuation to RTL equivalents
+const textWithPunctuation = "مرحبا, كيف حالك?";
+console.log(convertPunctuation(textWithPunctuation)); // "مرحبا، كيف حالك؟"
+
+// Convert numbers to Arabic or Persian digits
+console.log(toArabicDigits("Price 123")); // "Price ١٢٣"
+console.log(toPersianDigits("Price 123")); // "Price ۱۲۳"
 ```
 
-### Advanced Usage
-
-```typescript
-import { fixRTLDots } from 'rtl-text-tools';
-
-// Handle empty or null values gracefully
-console.log(fixRTLDots("")); // ""
-console.log(fixRTLDots(null)); // null
-
-// Mixed content
-const mixedText = "Hello مرحبا...";
-console.log(fixRTLDots(mixedText)); // "Hello ...مرحبا"
-
-// Multiple dots (only ellipsis is handled)
-console.log(fixRTLDots("Hello..")); // "Hello.." (unchanged)
-console.log(fixRTLDots("مرحبا..")); // "مرحبا.." (unchanged)
-```
 
 ## 🔧 API
 
-### `containsRTL(text: string): boolean`
+### `hasRTL(text: string): boolean`
 
 Detects if the provided text contains any RTL characters.
 
@@ -85,18 +77,46 @@ Detects if the provided text contains any RTL characters.
 - `true` if RTL characters are found, `false` otherwise
 
 **RTL character ranges:**
-- Arabic: `\u0600-\u06FF`, `\u0750-\u077F`, `\u08A0-\u08FF`
-- Hebrew: `\u0590-\u05FF`, `\uFB1D-\uFB4F`
+- Arabic: `\u0600-\u06FF`
+- Hebrew: `\u0590-\u05FF`
 - Arabic Supplement: `\u0750-\u077F`
 - Arabic Extended-A: `\u08A0-\u08FF`
-- Arabic Presentation Forms: `\uFB50-\uFDFF`, `\uFE70-\uFEFC`
+- RTL Presentation Forms: `\uFB1D-\uFDFF`, `\uFE70-\uFEFC`
 
-### `fixRTLDots(text: string): string`
+### `toArabicDigits(text: string): string`
+
+Converts Latin numbers (0-9) to Arabic numerals (٠-٩). Used for Arabic, Egyptian, and most Middle Eastern content.
+
+**Example:**
+```typescript
+toArabicDigits("Price 123") // "Price ١٢٣"
+```
+
+### `toPersianDigits(text: string): string`
+
+Converts Latin numbers (0-9) to Persian numerals (۰-۹). Used for Persian (Farsi), Urdu, Dari, and Pashto content.
+
+**Example:**
+```typescript
+toPersianDigits("Price 123") // "Price ۱۲۳"
+```
+
+### `convertPunctuation(text: string): string`
+
+Converts LTR punctuation marks to their RTL equivalents when RTL text is present.
+
+**Conversions:**
+- `,` (comma) → `،` (Arabic comma)
+- `?` (question) → `؟` (Arabic question mark)
+- `;` (semicolon) → `؛` (Arabic semicolon)
+
+**Returns:**
+- Text with RTL punctuation if RTL characters exist
+- Original text if no RTL characters found or text is empty/null
+
+### `moveEllipsis(text: string): string`
 
 Moves ellipsis (`...`) from the end to the beginning of the text when RTL characters are present.
-
-**Parameters:**
-- `text` - The string to process
 
 **Returns:**
 - Processed string with ellipsis repositioned for RTL text
@@ -104,11 +124,24 @@ Moves ellipsis (`...`) from the end to the beginning of the text when RTL charac
   - No RTL characters found
   - Text doesn't end with `...`
   - Text is empty or null
+  - Ellipsis appears in the middle of text
+
+### `fixRTL(text: string, lang?: "persian" | "arabic"): string`
+
+**Main function** - Applies all RTL text fixes at once:
+- Converts punctuation to RTL equivalents
+- Fixes ellipsis placement
+- Converts numbers to either Arabic or Persian digits
+
+**Parameters:**
+- `text` - The text to fix for RTL display
+- `lang` - Language type: `"persian"` (default) or `"arabic"`
 
 **Example:**
 ```typescript
-fixRTLDots("مرحبا...") // "...مرحبا"
-fixRTLDots("Hello...") // "Hello..."
+fixRTL("مرحبا, رقم 123...")              // "...مرحبا، رقم ۱۲۳" (Persian digits)
+fixRTL("مرحبا, رقم 123...", "arabic")    // "...مرحبا، رقم ١٢٣" (Arabic digits)
+fixRTL("Hello, world!")                  // "Hello, world!" (no RTL = unchanged)
 ```
 
 ## 🌍 Supported RTL Languages
@@ -120,7 +153,18 @@ fixRTLDots("Hello...") // "Hello..."
 - Pashto (پښتو)
 - Kurdish (سۆرانی)
 - Sindhi (سنڌي)
-- Other RTL scripts based on Unicode RTL ranges
+
+## 🔄 Version History
+
+### v0.2.0 (Current)
+- ✨ Added punctuation conversion (LTR → RTL)
+- ✨ Added digit conversion (Latin → Persian/Arabic)
+- ♻️ Refactored internal naming conventions
+
+### v0.1.0
+- 🎉 Initial release
+- ✅ RTL detection
+- ✅ Ellipsis fixing
 
 ## 🤝 Contributing
 

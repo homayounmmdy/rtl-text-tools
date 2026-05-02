@@ -1,8 +1,10 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.hasRTL = hasRTL;
+exports.toArabicDigits = toArabicDigits;
+exports.toPersianDigits = toPersianDigits;
 exports.convertPunctuation = convertPunctuation;
-exports.fixEllipsis = fixEllipsis;
+exports.moveEllipsis = moveEllipsis;
 exports.fixRTL = fixRTL;
 /**
  * Detects if text contains RTL characters (Arabic, Hebrew, Persian, etc.)
@@ -17,6 +19,42 @@ exports.fixRTL = fixRTL;
 function hasRTL(text) {
     const rtlRegex = /[\u0590-\u08FF\uFB1D-\uFDFF\uFE70-\uFEFC]/;
     return rtlRegex.test(text);
+}
+/**
+ * Converts Latin numbers (0-9) to Arabic numerals (٠-٩)
+ *
+ * Used for Arabic, Egyptian, and most Middle Eastern content.
+ *
+ * @param text - Text containing Latin numbers to convert
+ * @returns Text with Arabic numerals
+ *
+ * @example
+ * toArabic("Price 123") // "Price ١٢٣"
+ */
+function toArabicDigits(text) {
+    const map = {
+        '0': '٠', '1': '١', '2': '٢', '3': '٣', '4': '٤',
+        '5': '٥', '6': '٦', '7': '٧', '8': '٨', '9': '٩',
+    };
+    return text.replace(/[0-9]/g, (d) => map[d]);
+}
+/**
+ * Converts Latin numbers (0-9) to Persian numerals (۰-۹)
+ *
+ * Used for Persian (Farsi), Urdu, Dari, and Pashto content.
+ *
+ * @param text - Text containing Latin numbers to convert
+ * @returns Text with Persian numerals
+ *
+ * @example
+ * toPersian("Price 123") // "Price ۱۲۳"
+ */
+function toPersianDigits(text) {
+    const map = {
+        '0': '۰', '1': '۱', '2': '۲', '3': '۳', '4': '۴',
+        '5': '۵', '6': '۶', '7': '۷', '8': '۸', '9': '۹',
+    };
+    return text.replace(/[0-9]/g, (d) => map[d]);
 }
 /**
  * Converts LTR punctuation (, ; ?) to their RTL equivalents (، ؛ ؟)
@@ -55,11 +93,11 @@ function convertPunctuation(text) {
  * @returns Text with ellipsis moved to the front if it was at the end
  *
  * @example
- * fixEllipsis("مرحبا...")   // "...مرحبا"
- * fixEllipsis("مرحبا")      // "مرحبا"
- * fixEllipsis("مرحبا...كيف") // "مرحبا...كيف" (ellipsis in middle = unchanged)
+ * moveEllipsis("مرحبا...")   // "...مرحبا"
+ * moveEllipsis("مرحبا")      // "مرحبا"
+ * moveEllipsis("مرحبا...كيف") // "مرحبا...كيف" (ellipsis in middle = unchanged)
  */
-function fixEllipsis(text) {
+function moveEllipsis(text) {
     if (!text || !hasRTL(text)) {
         return text;
     }
@@ -72,21 +110,34 @@ function fixEllipsis(text) {
  * Applies all RTL text fixes at once:
  * - Converts punctuation to RTL equivalents
  * - Fixes ellipsis placement
+ * - Converts numbers to either Arabic or Persian digits
  *
  * This is the main function most users will need.
  *
  * @param text - The text to fix for RTL display
+ * @param lang - Language type: "persian" (default) or "arabic"
  * @returns Fully fixed RTL text
  *
  * @example
- * fixRTL("مرحبا, كيف حالك?...")   // "...مرحبا، كيف حالك؟"
+ * fixRTL("مرحبا, رقم 123...")        // "...مرحبا، رقم ١٢٣" (Persian digits)
+ * fixRTL("مرحبا, رقم 123...", "arabic") // "...مرحبا، رقم ١٢٣" (Arabic digits)
  * fixRTL("Hello, world!")         // "Hello, world!" (no RTL = unchanged)
  */
-function fixRTL(text) {
+function fixRTL(text, lang = "persian") {
     if (!text || !hasRTL(text)) {
         return text;
     }
-    return fixEllipsis(convertPunctuation(text));
+    // First convert digits based on language
+    let result = text;
+    if (lang === "persian") {
+        result = toPersianDigits(result);
+    }
+    else {
+        result = toArabicDigits(result);
+    }
+    // Then fix punctuation and ellipsis
+    result = convertPunctuation(result);
+    result = moveEllipsis(result);
+    return result;
 }
-// Default export the main helper
 exports.default = fixRTL;
