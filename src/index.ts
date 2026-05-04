@@ -1,4 +1,24 @@
 /**
+ * Normalizes text direction by wrapping text in Unicode direction controls
+ * This fixes mixed RTL/LTR text that becomes hard to read
+ *
+ * @param text - The text with mixed RTL/LTR content
+ * @returns Text with direction controls applied for proper readability
+ *
+ * @example
+ * normalizeDirection("من در پارکی راه می رفتم و یک تابلو دیدم که روش نوشته بود Do not Park here")
+ * // Returns with RLM + LTR wrap for English part
+ *
+ * normalizeDirection("Hello world سلام", "ltr") // For LTR base with RTL embedded
+ */
+
+export function normalizeDirection(text: string): string {
+    if (!text) return text;
+
+    return `'\u202B'${text}'\u202C'`; // RTL Embedding
+}
+
+/**
  * Detects if text contains RTL characters (Arabic, Hebrew, Persian, etc.)
  *
  * @param text - The text to check for RTL characters
@@ -9,9 +29,10 @@
  * hasRTL("مرحبا") // true
  */
 export function hasRTL(text: string): boolean {
-  const rtlRegex = /[\u0590-\u08FF\uFB1D-\uFDFF\uFE70-\uFEFC]/;
-  return rtlRegex.test(text);
+    const rtlRegex = /[\u0590-\u08FF\uFB1D-\uFDFF\uFE70-\uFEFC]/;
+    return rtlRegex.test(text);
 }
+
 /**
  * Converts Latin numbers (0-9) to Arabic numerals (٠-٩)
  *
@@ -24,11 +45,11 @@ export function hasRTL(text: string): boolean {
  * toArabic("Price 123") // "Price ١٢٣"
  */
 export function toArabicDigits(text: string): string {
-  const map: Record<string, string> = {
-    '0': '٠', '1': '١', '2': '٢', '3': '٣', '4': '٤',
-    '5': '٥', '6': '٦', '7': '٧', '8': '٨', '9': '٩',
-  };
-  return text.replace(/[0-9]/g, (d) => map[d]);
+    const map: Record<string, string> = {
+        '0': '٠', '1': '١', '2': '٢', '3': '٣', '4': '٤',
+        '5': '٥', '6': '٦', '7': '٧', '8': '٨', '9': '٩',
+    };
+    return text.replace(/[0-9]/g, (d) => map[d]);
 }
 
 /**
@@ -43,11 +64,11 @@ export function toArabicDigits(text: string): string {
  * toPersian("Price 123") // "Price ۱۲۳"
  */
 export function toPersianDigits(text: string): string {
-  const map: Record<string, string> = {
-    '0': '۰', '1': '۱', '2': '۲', '3': '۳', '4': '۴',
-    '5': '۵', '6': '۶', '7': '۷', '8': '۸', '9': '۹',
-  };
-  return text.replace(/[0-9]/g, (d) => map[d]);
+    const map: Record<string, string> = {
+        '0': '۰', '1': '۱', '2': '۲', '3': '۳', '4': '۴',
+        '5': '۵', '6': '۶', '7': '۷', '8': '۸', '9': '۹',
+    };
+    return text.replace(/[0-9]/g, (d) => map[d]);
 }
 
 /**
@@ -64,21 +85,21 @@ export function toPersianDigits(text: string): string {
  * convertPunctuation("Hello, world?")   // "Hello, world?" (no RTL text = unchanged)
  */
 export function convertPunctuation(text: string): string {
-  if (!text || !hasRTL(text)) return text;
+    if (!text || !hasRTL(text)) return text;
 
-  const punctuationMap: Record<string, string> = {
-    '?': '؟',  // Question mark
-    ',': '،',  // Comma
-    ';': '؛',  // Semicolon
-  };
+    const punctuationMap: Record<string, string> = {
+        '?': '؟',  // Question mark
+        ',': '،',  // Comma
+        ';': '؛',  // Semicolon
+    };
 
-  let result = text;
-  for (const [ltr, rtl] of Object.entries(punctuationMap)) {
-    result = result.replace(ltr, rtl);
-  }
+    let result = text;
+    for (const [ltr, rtl] of Object.entries(punctuationMap)) {
+        result = result.replace(ltr, rtl);
+    }
 
 
-  return result;
+    return result;
 }
 
 /**
@@ -96,15 +117,15 @@ export function convertPunctuation(text: string): string {
  * moveEllipsis("مرحبا...كيف") // "مرحبا...كيف" (ellipsis in middle = unchanged)
  */
 export function moveEllipsis(text: string): string {
-  if (!text || !hasRTL(text)) {
+    if (!text || !hasRTL(text)) {
+        return text;
+    }
+
+    if (text.endsWith('...')) {
+        return '...' + text.slice(0, -3);
+    }
+
     return text;
-  }
-
-  if (text.endsWith('...')) {
-    return '...' + text.slice(0, -3);
-  }
-
-  return text;
 }
 
 /**
@@ -124,24 +145,27 @@ export function moveEllipsis(text: string): string {
  * fixRTL("مرحبا, رقم 123...", "arabic") // "...مرحبا، رقم ١٢٣" (Arabic digits)
  * fixRTL("Hello, world!")         // "Hello, world!" (no RTL = unchanged)
  */
-export function fixRTL(text: string, lang : "persian" | "arabic" = "persian"): string {
-  if (!text || !hasRTL(text)) {
-    return text;
-  }
+export function fixRTL(text: string, lang: "persian" | "arabic" = "persian"): string {
+    if (!text || !hasRTL(text)) {
+        return text;
+    }
 
-  // First convert digits based on language
-  let result = text;
-      if (lang === "persian" ) {
-    result = toPersianDigits(result);
-      }else {
-    result = toArabicDigits(result);
-      }
+    // First convert digits based on language
+    let result = text;
+    if (lang === "persian") {
+        result = toPersianDigits(result);
+    } else {
+        result = toArabicDigits(result);
+    }
 
-  // Then fix punctuation and ellipsis
-  result = convertPunctuation(result);
-  result = moveEllipsis(result);
+    // Then fix punctuation and ellipsis
+    result = convertPunctuation(result);
+    result = moveEllipsis(result);
 
-  return result;
+    // Finally normalize direction
+    result = normalizeDirection(result);
+
+    return result;
 }
 
 export default fixRTL;

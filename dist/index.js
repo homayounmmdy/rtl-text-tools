@@ -1,11 +1,30 @@
 "use strict";
+/**
+ * Normalizes text direction by wrapping text in Unicode direction controls
+ * This fixes mixed RTL/LTR text that becomes hard to read
+ *
+ * @param text - The text with mixed RTL/LTR content
+ * @returns Text with direction controls applied for proper readability
+ *
+ * @example
+ * normalizeDirection("من در پارکی راه می رفتم و یک تابلو دیدم که روش نوشته بود Do not Park here")
+ * // Returns with RLM + LTR wrap for English part
+ *
+ * normalizeDirection("Hello world سلام", "ltr") // For LTR base with RTL embedded
+ */
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.normalizeDirection = normalizeDirection;
 exports.hasRTL = hasRTL;
 exports.toArabicDigits = toArabicDigits;
 exports.toPersianDigits = toPersianDigits;
 exports.convertPunctuation = convertPunctuation;
 exports.moveEllipsis = moveEllipsis;
 exports.fixRTL = fixRTL;
+function normalizeDirection(text) {
+    if (!text)
+        return text;
+    return `'\u202B'${text}'\u202C'`; // RTL Embedding
+}
 /**
  * Detects if text contains RTL characters (Arabic, Hebrew, Persian, etc.)
  *
@@ -138,6 +157,8 @@ function fixRTL(text, lang = "persian") {
     // Then fix punctuation and ellipsis
     result = convertPunctuation(result);
     result = moveEllipsis(result);
+    // Finally normalize direction
+    result = normalizeDirection(result);
     return result;
 }
 exports.default = fixRTL;

@@ -1,4 +1,18 @@
 /**
+ * Normalizes text direction by wrapping text in Unicode direction controls
+ * This fixes mixed RTL/LTR text that becomes hard to read
+ *
+ * @param text - The text with mixed RTL/LTR content
+ * @returns Text with direction controls applied for proper readability
+ *
+ * @example
+ * normalizeDirection("من در پارکی راه می رفتم و یک تابلو دیدم که روش نوشته بود Do not Park here")
+ * // Returns with RLM + LTR wrap for English part
+ *
+ * normalizeDirection("Hello world سلام", "ltr") // For LTR base with RTL embedded
+ */
+export declare function normalizeDirection(text: string): string;
+/**
  * Detects if text contains RTL characters (Arabic, Hebrew, Persian, etc.)
  *
  * @param text - The text to check for RTL characters
