@@ -8,6 +8,7 @@ A complete text processing toolkit for RTL (Right-to-Left) languages. Fix ellips
 ## 📜 Features
 
 - ✅ **RTL Detection** - Identify if text contains RTL characters
+- ✅ **Direction Normalization** - Fix mixed RTL/LTR text readability issues
 - ✅ **Ellipsis Fixing** - Move ellipsis (...) to the proper position for RTL languages
 - ✅ **Punctuation Conversion** - Convert LTR punctuation to RTL equivalents
 - ✅ **Digit Conversion** - Convert Latin digits to Persian/Arabic digits
@@ -34,7 +35,7 @@ pnpm add rtl-text-tools
 
 ## 📖 Usage
 
-### Basic Example
+### Basic Examples
 
 ```typescript
 import { hasRTL, moveEllipsis, convertPunctuation, toArabicDigits, toPersianDigits, fixRTL } from 'rtl-text-tools';
@@ -45,6 +46,11 @@ console.log(hasRTL(arabicText)); // true
 
 const englishText = "Hello World";
 console.log(hasRTL(englishText)); // false
+
+// Fix mixed RTL/LTR text readability
+const mixedText = "من در پارکی راه می رفتم و یک تابلو دیدم که روش نوشته بود Do not Park here";
+console.log(normalizeDirection(mixedText)); 
+// Text will render properly with RTL base direction
 
 // Fix ellipsis position for RTL text
 const textWithDots = "مرحبا...";
@@ -61,6 +67,10 @@ console.log(convertPunctuation(textWithPunctuation)); // "مرحبا، كيف ح
 // Convert numbers to Arabic or Persian digits
 console.log(toArabicDigits("Price 123")); // "Price ١٢٣"
 console.log(toPersianDigits("Price 123")); // "Price ۱۲۳"
+
+// Complete RTL text processing
+const problemText = "مرحبا, رقم 123...";
+console.log(fixRTL(problemText)); // "...مرحبا، رقم ۱۲۳"
 ```
 
 
@@ -82,6 +92,25 @@ Detects if the provided text contains any RTL characters.
 - Arabic Supplement: `\u0750-\u077F`
 - Arabic Extended-A: `\u08A0-\u08FF`
 - RTL Presentation Forms: `\uFB1D-\uFDFF`, `\uFE70-\uFEFC`
+
+### `normalizeDirection(text: string): string`
+
+**Parameters:**
+- `text` - The text with mixed RTL/LTR content
+
+**Returns:**
+- Text wrapped with RTL embedding controls for proper readability
+
+**Example:**
+```typescript
+// Without normalization - unreadable
+const mixed = "من در پارکی راه می رفتم Do not Park here";
+console.log(mixed); 
+
+// With normalization - properly readable
+console.log(normalizeDirection(mixed)); 
+// Text displays correctly with RTL base direction
+```
 
 ### `toArabicDigits(text: string): string`
 
@@ -124,11 +153,11 @@ Moves ellipsis (`...`) from the end to the beginning of the text when RTL charac
   - No RTL characters found
   - Text doesn't end with `...`
   - Text is empty or null
-  - Ellipsis appears in the middle of text
 
 ### `fixRTL(text: string, lang?: "persian" | "arabic"): string`
 
 **Main function** - Applies all RTL text fixes at once:
+- Normalizes text direction for mixed RTL/LTR content
 - Converts punctuation to RTL equivalents
 - Fixes ellipsis placement
 - Converts numbers to either Arabic or Persian digits
@@ -148,7 +177,7 @@ fixRTL("Hello, world!")                  // "Hello, world!" (no RTL = unchanged)
 
 - Arabic (العربية)
 - Hebrew (עברית)
-- Persian (فارسی)
+- Persian/Farsi (فارسی)
 - Urdu (اردو)
 - Pashto (پښتو)
 - Kurdish (سۆرانی)
