@@ -1,4 +1,35 @@
 /**
+ * rtl-fix - Cross-browser RTL text utility
+ *
+ * Supports: IE11+, Edge, Firefox, Chrome, Safari, all modern browsers.
+ * Handles Arabic, Hebrew, Persian, Urdu, Dari, Pashto, and other RTL scripts.
+ */
+
+// ─── RTL Detection ───────────────────────────────────────────────────────────
+
+/**
+ * Unicode ranges covering all major RTL scripts:
+ *
+ * \u0590-\u05FF  Hebrew
+ * \u0600-\u06FF  Arabic (core block, includes Persian/Urdu)
+ * \u0700-\u074F  Syriac
+ * \u0750-\u077F  Arabic Supplement
+ * \u0780-\u07BF  Thaana (Maldivian)
+ * \u07C0-\u07FF  N'Ko
+ * \u0800-\u083F  Samaritan
+ * \u0840-\u085F  Mandaic
+ * \u08A0-\u08FF  Arabic Extended-A
+ * \uFB1D-\uFB4F  Hebrew Presentation Forms
+ * \uFB50-\uFDFF  Arabic Presentation Forms-A
+ * \uFE70-\uFEFF  Arabic Presentation Forms-B
+ *
+ * NOTE: We intentionally avoid the `u` (unicode) regex flag for IE11 compatibility.
+ * These BMP (Basic Multilingual Plane) code points work fine without it.
+ */
+let RTL_REGEX = /[\u0590-\u05FF\u0600-\u08FF\uFB1D-\uFDFF\uFE70-\uFEFF]/;
+
+
+/**
  * Normalizes text direction by wrapping text in Unicode direction controls
  * This fixes mixed RTL/LTR text that becomes hard to read
  *
@@ -27,10 +58,11 @@ export function normalizeDirection(text: string): string {
  * @example
  * hasRTL("Hello") // false
  * hasRTL("مرحبا") // true
+ * hasRTL("שלום")  // true
  */
 export function hasRTL(text: string): boolean {
-    const rtlRegex = /[\u0590-\u08FF\uFB1D-\uFDFF\uFE70-\uFEFC]/;
-    return rtlRegex.test(text);
+    if (!text) return false;
+    return RTL_REGEX.test(text);
 }
 
 /**
