@@ -26,28 +26,38 @@
  * NOTE: We intentionally avoid the `u` (unicode) regex flag for IE11 compatibility.
  * These BMP (Basic Multilingual Plane) code points work fine without it.
  */
-let RTL_REGEX = /[\u0590-\u05FF\u0600-\u08FF\uFB1D-\uFDFF\uFE70-\uFEFF]/;
+var RTL_REGEX = /[\u0590-\u05FF\u0600-\u08FF\uFB1D-\uFDFF\uFE70-\uFEFF]/;
 
 
 /**
- * Normalizes text direction by wrapping text in Unicode direction controls
- * This fixes mixed RTL/LTR text that becomes hard to read
+ * rtl-fix - Cross-browser RTL text utility
  *
- * @param text - The text with mixed RTL/LTR content
- * @returns Text with direction controls applied for proper readability
- *
- * @example
- * normalizeDirection("من در پارکی راه می رفتم و یک تابلو دیدم که روش نوشته بود Do not Park here")
- * // Returns with RLM + LTR wrap for English part
- *
- * normalizeDirection("Hello world سلام", "ltr") // For LTR base with RTL embedded
+ * Supports: IE11+, Edge, Firefox, Chrome, Safari, all modern browsers.
+ * Handles Arabic, Hebrew, Persian, Urdu, Dari, Pashto, and other RTL scripts.
  */
 
-export function normalizeDirection(text: string): string {
-    if (!text) return text;
+// ─── RTL Detection ───────────────────────────────────────────────────────────
 
-    return `'\u202B'${text}'\u202C'`; // RTL Embedding
-}
+/**
+ * Unicode ranges covering all major RTL scripts:
+ *
+ * \u0590-\u05FF  Hebrew
+ * \u0600-\u06FF  Arabic (core block, includes Persian/Urdu)
+ * \u0700-\u074F  Syriac
+ * \u0750-\u077F  Arabic Supplement
+ * \u0780-\u07BF  Thaana (Maldivian)
+ * \u07C0-\u07FF  N'Ko
+ * \u0800-\u083F  Samaritan
+ * \u0840-\u085F  Mandaic
+ * \u08A0-\u08FF  Arabic Extended-A
+ * \uFB1D-\uFB4F  Hebrew Presentation Forms
+ * \uFB50-\uFDFF  Arabic Presentation Forms-A
+ * \uFE70-\uFEFF  Arabic Presentation Forms-B
+ *
+ * NOTE: We intentionally avoid the `u` (unicode) regex flag for IE11 compatibility.
+ * These BMP (Basic Multilingual Plane) code points work fine without it.
+ */
+var RTL_REGEX = /[\u0590-\u05FF\u0600-\u08FF\uFB1D-\uFDFF\uFE70-\uFEFF]/;
 
 /**
  * Detects if text contains RTL characters (Arabic, Hebrew, Persian, etc.)
@@ -56,7 +66,7 @@ export function normalizeDirection(text: string): string {
  * @returns `true` if the text contains any RTL characters, otherwise `false`
  *
  * @example
- * hasRTL("Hello") // false
+ * hasRTL("Hello")  // false
  * hasRTL("مرحبا") // true
  * hasRTL("שלום")  // true
  */
@@ -67,14 +77,14 @@ export function hasRTL(text: string): boolean {
 
 // ─── Digit Conversion ────────────────────────────────────────────────────────
 
-const ARABIC_DIGITS: Record<string, string> = {
-  '0': '\u0660', '1': '\u0661', '2': '\u0662', '3': '\u0663', '4': '\u0664',
-  '5': '\u0665', '6': '\u0666', '7': '\u0667', '8': '\u0668', '9': '\u0669',
+var ARABIC_DIGITS: Record<string, string> = {
+    '0': '\u0660', '1': '\u0661', '2': '\u0662', '3': '\u0663', '4': '\u0664',
+    '5': '\u0665', '6': '\u0666', '7': '\u0667', '8': '\u0668', '9': '\u0669',
 };
 
-const PERSIAN_DIGITS: Record<string, string> = {
-  '0': '\u06F0', '1': '\u06F1', '2': '\u06F2', '3': '\u06F3', '4': '\u06F4',
-  '5': '\u06F5', '6': '\u06F6', '7': '\u06F7', '8': '\u06F8', '9': '\u06F9',
+var PERSIAN_DIGITS: Record<string, string> = {
+    '0': '\u06F0', '1': '\u06F1', '2': '\u06F2', '3': '\u06F3', '4': '\u06F4',
+    '5': '\u06F5', '6': '\u06F6', '7': '\u06F7', '8': '\u06F8', '9': '\u06F9',
 };
 
 /**
@@ -89,8 +99,8 @@ const PERSIAN_DIGITS: Record<string, string> = {
  * toArabicDigits("Price 123") // "Price ١٢٣"
  */
 export function toArabicDigits(text: string): string {
-  if (!text) return text;
-  return text.replace(/[0-9]/g, function(d) { return ARABIC_DIGITS[d]; });
+    if (!text) return text;
+    return text.replace(/[0-9]/g, function(d) { return ARABIC_DIGITS[d]; });
 }
 
 /**
@@ -105,105 +115,295 @@ export function toArabicDigits(text: string): string {
  * toPersianDigits("Price 123") // "Price ۱۲۳"
  */
 export function toPersianDigits(text: string): string {
-  if (!text) return text;
-  return text.replace(/[0-9]/g, function(d) { return PERSIAN_DIGITS[d]; });
+    if (!text) return text;
+    return text.replace(/[0-9]/g, function(d) { return PERSIAN_DIGITS[d]; });
 }
 
+// ─── Punctuation ─────────────────────────────────────────────────────────────
+
 /**
- * Converts LTR punctuation (, ; ?) to their RTL equivalents (، ؛ ؟)
+ * Maps LTR punctuation to their RTL equivalents.
  *
- * This is useful when displaying user-generated content or mixing LTR punctuation
- * in RTL text, which can look awkward or out of place.
+ * NOTE: We replace ALL occurrences (not just the first) using a global regex
+ * per character — this is the IE11-safe way to do it since
+ * String.prototype.replaceAll() is not available in IE11 or old Safari.
+ */
+var PUNCTUATION_MAP: Array<[RegExp, string]> = [
+    [/\?/g,  '\u061F'], // ؟  Arabic Question Mark
+    [/,/g,   '\u060C'], // ،  Arabic Comma
+    [/;/g,   '\u061B'], // ؛  Arabic Semicolon
+];
+
+/**
+ * Converts LTR punctuation (`, ; ?`) to their RTL equivalents (`، ؛ ؟`)
+ *
+ * Only applies to text that contains RTL characters.
+ * Replaces ALL occurrences (the original implementation only replaced the first).
  *
  * @param text - The text to convert punctuation in
- * @returns Text with RTL punctuation marks where applicable
+ * @returns Text with RTL-appropriate punctuation marks
  *
  * @example
- * convertPunctuation("مرحبا, كيف حالك?") // "مرحبا، كيف حالك؟"
- * convertPunctuation("Hello, world?")   // "Hello, world?" (no RTL text = unchanged)
+ * convertPunctuation("مرحبا, كيف حالك?")   // "مرحبا، كيف حالك؟"
+ * convertPunctuation("Hello, world?")      // "Hello, world?" (no RTL = unchanged)
  */
 export function convertPunctuation(text: string): string {
     if (!text || !hasRTL(text)) return text;
 
-    const punctuationMap: Record<string, string> = {
-        '?': '؟',  // Question mark
-        ',': '،',  // Comma
-        ';': '؛',  // Semicolon
-    };
-
-    let result = text;
-    for (const [ltr, rtl] of Object.entries(punctuationMap)) {
-        result = result.replace(ltr, rtl);
+    var result = text;
+    for (var i = 0; i < PUNCTUATION_MAP.length; i++) {
+        result = result.replace(PUNCTUATION_MAP[i][0], PUNCTUATION_MAP[i][1]);
     }
-
-
     return result;
 }
 
+// ─── Ellipsis ────────────────────────────────────────────────────────────────
+
 /**
- * Moves ellipsis (...) from the end to the beginning of RTL text
+ * Moves a trailing ellipsis (`...` or `…`) to the start of RTL text.
  *
- * In RTL languages (Arabic, Hebrew, Persian), ellipsis traditionally appears
- * at the beginning of the text rather than at the end.
+ * In RTL languages, truncation ellipsis traditionally appears at the visual
+ * start (the right side), which is the logical beginning of the string.
+ *
+ * Handles both the three-dot sequence `...` and the single Unicode
+ * HORIZONTAL ELLIPSIS character `…` (U+2026).
  *
  * @param text - The text to fix ellipsis placement in
  * @returns Text with ellipsis moved to the front if it was at the end
  *
  * @example
- * moveEllipsis("مرحبا...")   // "...مرحبا"
- * moveEllipsis("مرحبا")      // "مرحبا"
- * moveEllipsis("مرحبا...كيف") // "مرحبا...كيف" (ellipsis in middle = unchanged)
+ * moveEllipsis("مرحبا...")    // "...مرحبا"
+ * moveEllipsis("مرحبا…")     // "…مرحبا"
+ * moveEllipsis("مرحبا")       // "مرحبا"
+ * moveEllipsis("مرحبا...كيف") // "مرحبا...كيف" (middle = unchanged)
  */
 export function moveEllipsis(text: string): string {
-    if (!text || !hasRTL(text)) {
-        return text;
+    if (!text || !hasRTL(text)) return text;
+
+    // Unicode ellipsis character (U+2026)
+    if (text.charAt(text.length - 1) === '\u2026') {
+        return '\u2026' + text.slice(0, -1);
     }
 
-    if (text.endsWith('...')) {
+    // Three-dot ellipsis
+    if (text.slice(-3) === '...') {
         return '...' + text.slice(0, -3);
     }
 
     return text;
 }
 
+// ─── Bidi Isolation ──────────────────────────────────────────────────────────
+
 /**
- * Applies all RTL text fixes at once:
- * - Converts punctuation to RTL equivalents
- * - Fixes ellipsis placement
- * - Converts numbers to either Arabic or Persian digits
+ * Unicode bidirectional control characters for explicit direction overrides.
  *
- * This is the main function most users will need.
+ * These are invisible characters inserted into the text stream.
+ * They are widely supported (IE8+) and the most reliable way to force
+ * correct bidi rendering in older browsers that do not support the
+ * CSS `unicode-bidi` or `direction` properties.
+ */
+var BIDI = {
+    /** U+202B  RIGHT-TO-LEFT EMBEDDING — starts an RTL embedding level */
+    RLE: '\u202B',
+    /** U+202A  LEFT-TO-RIGHT EMBEDDING — starts an LTR embedding level */
+    LRE: '\u202A',
+    /** U+202C  POP DIRECTIONAL FORMATTING — ends the current embedding */
+    PDF: '\u202C',
+    /** U+200F  RIGHT-TO-LEFT MARK — a zero-width RTL character */
+    RLM: '\u200F',
+    /** U+200E  LEFT-TO-RIGHT MARK — a zero-width LTR character */
+    LRM: '\u200E',
+    /** U+2067  RIGHT-TO-LEFT ISOLATE (HTML5 / modern browsers only) */
+    RLI: '\u2067',
+    /** U+2066  LEFT-TO-RIGHT ISOLATE (HTML5 / modern browsers only) */
+    LRI: '\u2066',
+    /** U+2069  POP DIRECTIONAL ISOLATE */
+    PDI: '\u2069',
+};
+
+/**
+ * Wraps text with Unicode bidi control characters to force RTL rendering.
  *
- * @param text - The text to fix for RTL display
- * @param lang - Language type: "persian" (default) or "arabic"
- * @returns Fully fixed RTL text
+ * Uses RLE/PDF (IE8+) with RLM prefix for maximum compatibility.
+ * Modern browsers also benefit from the explicit directional markers.
+ *
+ * @param text - The text to wrap
+ * @returns Text wrapped with RTL bidi markers
  *
  * @example
- * fixRTL("مرحبا, رقم 123...")        // "...مرحبا، رقم ١٢٣" (Persian digits)
- * fixRTL("مرحبا, رقم 123...", "arabic") // "...مرحبا، رقم ١٢٣" (Arabic digits)
- * fixRTL("Hello, world!")         // "Hello, world!" (no RTL = unchanged)
+ * wrapRTL("مرحبا") // "\u200F\u202Bمرحبا\u202C"
  */
-export function fixRTL(text: string, lang: "persian" | "arabic" = "persian"): string {
-    if (!text || !hasRTL(text)) {
-        return text;
+export function wrapRTL(text: string): string {
+    if (!text) return text;
+    return BIDI.RLM + BIDI.RLE + text + BIDI.PDF;
+}
+
+/**
+ * Wraps text with Unicode bidi control characters to force LTR rendering.
+ *
+ * Useful for embedding LTR content (e.g. URLs, numbers, code) inside RTL text.
+ *
+ * @param text - The text to wrap
+ * @returns Text wrapped with LTR bidi markers
+ *
+ * @example
+ * wrapLTR("https://example.com") // "\u200E\u202Ahttps://example.com\u202C"
+ */
+export function wrapLTR(text: string): string {
+    if (!text) return text;
+    return BIDI.LRM + BIDI.LRE + text + BIDI.PDF;
+}
+
+// ─── CSS Direction Helpers ───────────────────────────────────────────────────
+
+/**
+ * Returns a CSS style object for RTL layout.
+ *
+ * Apply to any container element to trigger proper RTL rendering.
+ * Works in all browsers (IE6+).
+ *
+ * @returns `{ direction: 'rtl', unicodeBidi: 'embed' }`
+ *
+ * @example
+ * // React
+ * <div style={getRTLStyles()}>مرحبا</div>
+ *
+ * // Vanilla JS
+ * Object.assign(el.style, getRTLStyles());
+ */
+export function getRTLStyles(): { direction: string; unicodeBidi: string } {
+    return { direction: 'rtl', unicodeBidi: 'embed' };
+}
+
+/**
+ * Returns a CSS style object for LTR layout.
+ *
+ * @returns `{ direction: 'ltr', unicodeBidi: 'embed' }`
+ */
+export function getLTRStyles(): { direction: string; unicodeBidi: string } {
+    return { direction: 'ltr', unicodeBidi: 'embed' };
+}
+
+
+
+/**
+ * Sets `dir` and `lang` attributes on a DOM element for correct RTL rendering.
+ *
+ * This is the most reliable approach for HTML — it activates the browser's
+ * built-in bidi algorithm and is respected by screen readers.
+ *
+ * @param element - The DOM element to configure
+ * @param lang    - BCP 47 language tag, e.g. "ar", "he", "fa", "ur"
+ *
+ * @example
+ * setDirAttribute(document.getElementById("content"), "ar");
+ * // → <div id="content" dir="rtl" lang="ar">
+ */
+export function setDirAttribute(element: HTMLElement, lang: string): void {
+    element.setAttribute('dir', 'rtl');
+    if (lang) element.setAttribute('lang', lang);
+}
+
+// ─── Main API ────────────────────────────────────────────────────────────────
+
+export type Language = 'arabic' | 'persian';
+
+export interface FixRTLOptions {
+    /**
+     * Target language. Controls which digit set is used.
+     * - `"arabic"`  → Arabic-Indic digits ٠١٢٣٤٥٦٧٨٩  (default for Arabic locales)
+     * - `"persian"` → Extended Persian digits ۰۱۲۳۴۵۶۷۸۹  (default)
+     */
+    lang?: Language;
+    /**
+     * Convert Latin digits to locale-appropriate digits.
+     * @default true
+     */
+    convertDigits?: boolean;
+    /**
+     * Convert LTR punctuation to RTL equivalents.
+     * @default true
+     */
+    convertPunctuation?: boolean;
+    /**
+     * Move trailing ellipsis to the start of the text.
+     * @default true
+     */
+    fixEllipsis?: boolean;
+    /**
+     * Wrap the result with Unicode bidi control characters (RLE/PDF).
+     * Useful for plain-text contexts where CSS `direction` cannot be applied.
+     * @default false
+     */
+    addBidiMarkers?: boolean;
+}
+
+/**
+ * Applies all RTL text fixes at once — the main entry point.
+ *
+ * Fixes applied (all enabled by default):
+ * 1. Digit conversion (Latin → Arabic-Indic or Persian-Indic)
+ * 2. Punctuation conversion (LTR → RTL equivalents)
+ * 3. Ellipsis repositioning (end → start)
+ *
+ * Optionally wraps the result in Unicode bidi markers for plain-text contexts.
+ *
+ * Returns the original string unchanged if it contains no RTL characters.
+ *
+ * @param text    - The text to fix
+ * @param options - Configuration object, or a language string for shorthand
+ *
+ * @example
+ * fixRTL("مرحبا, رقم 123...")
+ * // "...مرحبا، رقم ۱۲۳"  (Persian digits, RTL punctuation, ellipsis moved)
+ *
+ * fixRTL("مرحبا, رقم 123...", { lang: "arabic" })
+ * // "...مرحبا، رقم ١٢٣"  (Arabic-Indic digits)
+ *
+ * fixRTL("Hello, world!")
+ * // "Hello, world!"  (no RTL characters → unchanged)
+ *
+ * fixRTL("مرحبا", { addBidiMarkers: true })
+ * // "\u200F\u202Bمرحبا\u202C"  (wrapped for plain-text bidi)
+ */
+export function fixRTL(text: string, options?: FixRTLOptions | Language): string {
+    if (!text || !hasRTL(text)) return text;
+
+    // Support legacy string shorthand: fixRTL(text, "arabic")
+    var opts: FixRTLOptions = {};
+    if (typeof options === 'string') {
+        opts.lang = options;
+    } else if (options) {
+        opts = options;
     }
 
-    // First convert digits based on language
-    let result = text;
-    if (lang === "persian") {
-        result = toPersianDigits(result);
-    } else {
-        result = toArabicDigits(result);
+    var lang             = opts.lang             !== undefined ? opts.lang             : 'persian';
+    var doDigits         = opts.convertDigits    !== undefined ? opts.convertDigits    : true;
+    var doPunctuation    = opts.convertPunctuation !== undefined ? opts.convertPunctuation : true;
+    var doEllipsis       = opts.fixEllipsis      !== undefined ? opts.fixEllipsis      : true;
+    var doBidiMarkers    = opts.addBidiMarkers   !== undefined ? opts.addBidiMarkers   : false;
+
+    var result = text;
+
+    if (doDigits) {
+        result = lang === 'arabic' ? toArabicDigits(result) : toPersianDigits(result);
     }
 
-    // Then fix punctuation and ellipsis
-    result = convertPunctuation(result);
-    result = moveEllipsis(result);
+    if (doPunctuation) {
+        result = convertPunctuation(result);
+    }
 
-    // Finally normalize direction
-    result = normalizeDirection(result);
+    if (doEllipsis) {
+        result = moveEllipsis(result);
+    }
+
+    if (doBidiMarkers) {
+        result = wrapRTL(result);
+    }
 
     return result;
 }
 
+export { BIDI };
 export default fixRTL;
