@@ -65,42 +65,48 @@ export function hasRTL(text: string): boolean {
     return RTL_REGEX.test(text);
 }
 
+// ─── Digit Conversion ────────────────────────────────────────────────────────
+
+const ARABIC_DIGITS: Record<string, string> = {
+  '0': '\u0660', '1': '\u0661', '2': '\u0662', '3': '\u0663', '4': '\u0664',
+  '5': '\u0665', '6': '\u0666', '7': '\u0667', '8': '\u0668', '9': '\u0669',
+};
+
+const PERSIAN_DIGITS: Record<string, string> = {
+  '0': '\u06F0', '1': '\u06F1', '2': '\u06F2', '3': '\u06F3', '4': '\u06F4',
+  '5': '\u06F5', '6': '\u06F6', '7': '\u06F7', '8': '\u06F8', '9': '\u06F9',
+};
+
 /**
- * Converts Latin numbers (0-9) to Arabic numerals (٠-٩)
+ * Converts Latin digits (0-9) to Arabic-Indic numerals (٠-٩)
  *
- * Used for Arabic, Egyptian, and most Middle Eastern content.
+ * Used for Arabic, Egyptian, and most Middle Eastern locales.
  *
- * @param text - Text containing Latin numbers to convert
- * @returns Text with Arabic numerals
+ * @param text - Text containing Latin digits to convert
+ * @returns Text with Arabic-Indic numerals
  *
  * @example
- * toArabic("Price 123") // "Price ١٢٣"
+ * toArabicDigits("Price 123") // "Price ١٢٣"
  */
 export function toArabicDigits(text: string): string {
-    const map: Record<string, string> = {
-        '0': '٠', '1': '١', '2': '٢', '3': '٣', '4': '٤',
-        '5': '٥', '6': '٦', '7': '٧', '8': '٨', '9': '٩',
-    };
-    return text.replace(/[0-9]/g, (d) => map[d]);
+  if (!text) return text;
+  return text.replace(/[0-9]/g, function(d) { return ARABIC_DIGITS[d]; });
 }
 
 /**
- * Converts Latin numbers (0-9) to Persian numerals (۰-۹)
+ * Converts Latin digits (0-9) to Extended Persian numerals (۰-۹)
  *
- * Used for Persian (Farsi), Urdu, Dari, and Pashto content.
+ * Used for Persian (Farsi), Urdu, Dari, and Pashto locales.
  *
- * @param text - Text containing Latin numbers to convert
- * @returns Text with Persian numerals
+ * @param text - Text containing Latin digits to convert
+ * @returns Text with Persian-Indic numerals
  *
  * @example
- * toPersian("Price 123") // "Price ۱۲۳"
+ * toPersianDigits("Price 123") // "Price ۱۲۳"
  */
 export function toPersianDigits(text: string): string {
-    const map: Record<string, string> = {
-        '0': '۰', '1': '۱', '2': '۲', '3': '۳', '4': '۴',
-        '5': '۵', '6': '۶', '7': '۷', '8': '۸', '9': '۹',
-    };
-    return text.replace(/[0-9]/g, (d) => map[d]);
+  if (!text) return text;
+  return text.replace(/[0-9]/g, function(d) { return PERSIAN_DIGITS[d]; });
 }
 
 /**
