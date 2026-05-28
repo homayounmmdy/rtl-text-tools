@@ -1,7 +1,7 @@
 {
   "name": "rtl-text-tools",
-  "version": "0.2.0",
-  "description": "Complete text processing toolkit for RTL languages - fix ellipsis, punctuation, spacing, and more",
+  "version": "1.0.0",
+  "description": "Cross-browser RTL text utility — fixes digits, punctuation, ellipsis, and bidi markers for Arabic, Hebrew, Persian, Urdu, and other RTL scripts. Supports IE11+.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
@@ -10,18 +10,20 @@
   },
   "keywords": [
     "rtl",
-    "ellipsis",
     "arabic",
     "hebrew",
     "persian",
+    "farsi",
     "urdu",
-    "text",
-    "fix",
-    "detect",
-    "punctuation",
-    "spacing",
-    "typescript",
-    "unicode"
+    "bidi",
+    "unicode",
+    "i18n",
+    "l10n",
+    "right-to-left",
+    "cross-browser",
+    "ie11",
+    "digits",
+    "punctuation"
   ],
   "author": {
     "name": "Homayoun Mohammadi",
