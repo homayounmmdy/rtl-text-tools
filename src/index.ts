@@ -5,76 +5,8 @@
  * Handles Arabic, Hebrew, Persian, Urdu, Dari, Pashto, and other RTL scripts.
  */
 import { fixBracketsArabic, toArabicDigits } from "./arabic";
-import { fixBrackets, wrapRTL } from "./general";
+import { fixBrackets, hasRTL, wrapRTL } from "./general";
 import { toPersianDigits } from "./persian";
-// ─── RTL Detection ───────────────────────────────────────────────────────────
-
-/**
- * Unicode ranges covering all major RTL scripts:
- *
- * \u0590-\u05FF  Hebrew
- * \u0600-\u06FF  Arabic (core block, includes Persian/Urdu)
- * \u0700-\u074F  Syriac
- * \u0750-\u077F  Arabic Supplement
- * \u0780-\u07BF  Thaana (Maldivian)
- * \u07C0-\u07FF  N'Ko
- * \u0800-\u083F  Samaritan
- * \u0840-\u085F  Mandaic
- * \u08A0-\u08FF  Arabic Extended-A
- * \uFB1D-\uFB4F  Hebrew Presentation Forms
- * \uFB50-\uFDFF  Arabic Presentation Forms-A
- * \uFE70-\uFEFF  Arabic Presentation Forms-B
- *
- * NOTE: We intentionally avoid the `u` (unicode) regex flag for IE11 compatibility.
- * These BMP (Basic Multilingual Plane) code points work fine without it.
- */
-var RTL_REGEX = /[\u0590-\u05FF\u0600-\u08FF\uFB1D-\uFDFF\uFE70-\uFEFF]/;
-
-/**
- * rtl-fix - Cross-browser RTL text utility
- *
- * Supports: IE11+, Edge, Firefox, Chrome, Safari, all modern browsers.
- * Handles Arabic, Hebrew, Persian, Urdu, Dari, Pashto, and other RTL scripts.
- */
-
-// ─── RTL Detection ───────────────────────────────────────────────────────────
-
-/**
- * Unicode ranges covering all major RTL scripts:
- *
- * \u0590-\u05FF  Hebrew
- * \u0600-\u06FF  Arabic (core block, includes Persian/Urdu)
- * \u0700-\u074F  Syriac
- * \u0750-\u077F  Arabic Supplement
- * \u0780-\u07BF  Thaana (Maldivian)
- * \u07C0-\u07FF  N'Ko
- * \u0800-\u083F  Samaritan
- * \u0840-\u085F  Mandaic
- * \u08A0-\u08FF  Arabic Extended-A
- * \uFB1D-\uFB4F  Hebrew Presentation Forms
- * \uFB50-\uFDFF  Arabic Presentation Forms-A
- * \uFE70-\uFEFF  Arabic Presentation Forms-B
- *
- * NOTE: We intentionally avoid the `u` (unicode) regex flag for IE11 compatibility.
- * These BMP (Basic Multilingual Plane) code points work fine without it.
- */
-var RTL_REGEX = /[\u0590-\u05FF\u0600-\u08FF\uFB1D-\uFDFF\uFE70-\uFEFF]/;
-
-/**
- * Detects if text contains RTL characters (Arabic, Hebrew, Persian, etc.)
- *
- * @param text - The text to check for RTL characters
- * @returns `true` if the text contains any RTL characters, otherwise `false`
- *
- * @example
- * hasRTL("Hello")  // false
- * hasRTL("مرحبا") // true
- * hasRTL("שלום")  // true
- */
-export function hasRTL(text: string): boolean {
-  if (!text) return false;
-  return RTL_REGEX.test(text);
-}
 
 // ─── Punctuation ─────────────────────────────────────────────────────────────
 
@@ -322,7 +254,7 @@ export function fixRTL(
 }
 
 export { fixBracketsArabic, toArabicDigits } from "./arabic";
-export { BIDI, fixBrackets, wrapLTR, wrapRTL } from "./general";
+export { BIDI, fixBrackets, hasRTL, wrapLTR, wrapRTL } from "./general";
 export { hasHebrew } from "./hebrew";
 export { toPersianDigits } from "./persian";
 
