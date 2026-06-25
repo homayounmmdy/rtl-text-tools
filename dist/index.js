@@ -1,301 +1,16 @@
 "use strict";
-/**
- * rtl-fix - Cross-browser RTL text utility
- *
- * Supports: IE11+, Edge, Firefox, Chrome, Safari, all modern browsers.
- * Handles Arabic, Hebrew, Persian, Urdu, Dari, Pashto, and other RTL scripts.
- */
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.BIDI = void 0;
-exports.hasRTL = hasRTL;
-exports.toArabicDigits = toArabicDigits;
-exports.toPersianDigits = toPersianDigits;
-exports.convertPunctuation = convertPunctuation;
-exports.moveEllipsis = moveEllipsis;
-exports.wrapRTL = wrapRTL;
-exports.wrapLTR = wrapLTR;
-exports.getRTLStyles = getRTLStyles;
-exports.getLTRStyles = getLTRStyles;
-exports.setDirAttribute = setDirAttribute;
+exports.toPersianDigits = exports.hasHebrew = exports.wrapRTL = exports.wrapLTR = exports.moveEllipsis = exports.hasRTL = exports.fixBrackets = exports.convertPunctuation = exports.BIDI = exports.setDirAttribute = exports.getRTLStyles = exports.getLTRStyles = exports.toArabicDigits = exports.fixBracketsArabic = void 0;
 exports.fixRTL = fixRTL;
-// ─── RTL Detection ───────────────────────────────────────────────────────────
-/**
- * Unicode ranges covering all major RTL scripts:
- *
- * \u0590-\u05FF  Hebrew
- * \u0600-\u06FF  Arabic (core block, includes Persian/Urdu)
- * \u0700-\u074F  Syriac
- * \u0750-\u077F  Arabic Supplement
- * \u0780-\u07BF  Thaana (Maldivian)
- * \u07C0-\u07FF  N'Ko
- * \u0800-\u083F  Samaritan
- * \u0840-\u085F  Mandaic
- * \u08A0-\u08FF  Arabic Extended-A
- * \uFB1D-\uFB4F  Hebrew Presentation Forms
- * \uFB50-\uFDFF  Arabic Presentation Forms-A
- * \uFE70-\uFEFF  Arabic Presentation Forms-B
- *
- * NOTE: We intentionally avoid the `u` (unicode) regex flag for IE11 compatibility.
- * These BMP (Basic Multilingual Plane) code points work fine without it.
- */
-var RTL_REGEX = /[\u0590-\u05FF\u0600-\u08FF\uFB1D-\uFDFF\uFE70-\uFEFF]/;
 /**
  * rtl-fix - Cross-browser RTL text utility
  *
  * Supports: IE11+, Edge, Firefox, Chrome, Safari, all modern browsers.
  * Handles Arabic, Hebrew, Persian, Urdu, Dari, Pashto, and other RTL scripts.
  */
-// ─── RTL Detection ───────────────────────────────────────────────────────────
-/**
- * Unicode ranges covering all major RTL scripts:
- *
- * \u0590-\u05FF  Hebrew
- * \u0600-\u06FF  Arabic (core block, includes Persian/Urdu)
- * \u0700-\u074F  Syriac
- * \u0750-\u077F  Arabic Supplement
- * \u0780-\u07BF  Thaana (Maldivian)
- * \u07C0-\u07FF  N'Ko
- * \u0800-\u083F  Samaritan
- * \u0840-\u085F  Mandaic
- * \u08A0-\u08FF  Arabic Extended-A
- * \uFB1D-\uFB4F  Hebrew Presentation Forms
- * \uFB50-\uFDFF  Arabic Presentation Forms-A
- * \uFE70-\uFEFF  Arabic Presentation Forms-B
- *
- * NOTE: We intentionally avoid the `u` (unicode) regex flag for IE11 compatibility.
- * These BMP (Basic Multilingual Plane) code points work fine without it.
- */
-var RTL_REGEX = /[\u0590-\u05FF\u0600-\u08FF\uFB1D-\uFDFF\uFE70-\uFEFF]/;
-/**
- * Detects if text contains RTL characters (Arabic, Hebrew, Persian, etc.)
- *
- * @param text - The text to check for RTL characters
- * @returns `true` if the text contains any RTL characters, otherwise `false`
- *
- * @example
- * hasRTL("Hello")  // false
- * hasRTL("مرحبا") // true
- * hasRTL("שלום")  // true
- */
-function hasRTL(text) {
-    if (!text)
-        return false;
-    return RTL_REGEX.test(text);
-}
-// ─── Digit Conversion ────────────────────────────────────────────────────────
-var ARABIC_DIGITS = {
-    '0': '\u0660', '1': '\u0661', '2': '\u0662', '3': '\u0663', '4': '\u0664',
-    '5': '\u0665', '6': '\u0666', '7': '\u0667', '8': '\u0668', '9': '\u0669',
-};
-var PERSIAN_DIGITS = {
-    '0': '\u06F0', '1': '\u06F1', '2': '\u06F2', '3': '\u06F3', '4': '\u06F4',
-    '5': '\u06F5', '6': '\u06F6', '7': '\u06F7', '8': '\u06F8', '9': '\u06F9',
-};
-/**
- * Converts Latin digits (0-9) to Arabic-Indic numerals (٠-٩)
- *
- * Used for Arabic, Egyptian, and most Middle Eastern locales.
- *
- * @param text - Text containing Latin digits to convert
- * @returns Text with Arabic-Indic numerals
- *
- * @example
- * toArabicDigits("Price 123") // "Price ١٢٣"
- */
-function toArabicDigits(text) {
-    if (!text)
-        return text;
-    return text.replace(/[0-9]/g, function (d) { return ARABIC_DIGITS[d]; });
-}
-/**
- * Converts Latin digits (0-9) to Extended Persian numerals (۰-۹)
- *
- * Used for Persian (Farsi), Urdu, Dari, and Pashto locales.
- *
- * @param text - Text containing Latin digits to convert
- * @returns Text with Persian-Indic numerals
- *
- * @example
- * toPersianDigits("Price 123") // "Price ۱۲۳"
- */
-function toPersianDigits(text) {
-    if (!text)
-        return text;
-    return text.replace(/[0-9]/g, function (d) { return PERSIAN_DIGITS[d]; });
-}
-// ─── Punctuation ─────────────────────────────────────────────────────────────
-/**
- * Maps LTR punctuation to their RTL equivalents.
- *
- * NOTE: We replace ALL occurrences (not just the first) using a global regex
- * per character — this is the IE11-safe way to do it since
- * String.prototype.replaceAll() is not available in IE11 or old Safari.
- */
-var PUNCTUATION_MAP = [
-    [/\?/g, '\u061F'], // ؟  Arabic Question Mark
-    [/,/g, '\u060C'], // ،  Arabic Comma
-    [/;/g, '\u061B'], // ؛  Arabic Semicolon
-];
-/**
- * Converts LTR punctuation (`, ; ?`) to their RTL equivalents (`، ؛ ؟`)
- *
- * Only applies to text that contains RTL characters.
- * Replaces ALL occurrences (the original implementation only replaced the first).
- *
- * @param text - The text to convert punctuation in
- * @returns Text with RTL-appropriate punctuation marks
- *
- * @example
- * convertPunctuation("مرحبا, كيف حالك?")   // "مرحبا، كيف حالك؟"
- * convertPunctuation("Hello, world?")      // "Hello, world?" (no RTL = unchanged)
- */
-function convertPunctuation(text) {
-    if (!text || !hasRTL(text))
-        return text;
-    var result = text;
-    for (var i = 0; i < PUNCTUATION_MAP.length; i++) {
-        result = result.replace(PUNCTUATION_MAP[i][0], PUNCTUATION_MAP[i][1]);
-    }
-    return result;
-}
-// ─── Ellipsis ────────────────────────────────────────────────────────────────
-/**
- * Moves a trailing ellipsis (`...` or `…`) to the start of RTL text.
- *
- * In RTL languages, truncation ellipsis traditionally appears at the visual
- * start (the right side), which is the logical beginning of the string.
- *
- * Handles both the three-dot sequence `...` and the single Unicode
- * HORIZONTAL ELLIPSIS character `…` (U+2026).
- *
- * @param text - The text to fix ellipsis placement in
- * @returns Text with ellipsis moved to the front if it was at the end
- *
- * @example
- * moveEllipsis("مرحبا...")    // "...مرحبا"
- * moveEllipsis("مرحبا…")     // "…مرحبا"
- * moveEllipsis("مرحبا")       // "مرحبا"
- * moveEllipsis("مرحبا...كيف") // "مرحبا...كيف" (middle = unchanged)
- */
-function moveEllipsis(text) {
-    if (!text || !hasRTL(text))
-        return text;
-    // Unicode ellipsis character (U+2026)
-    if (text.charAt(text.length - 1) === '\u2026') {
-        return '\u2026' + text.slice(0, -1);
-    }
-    // Three-dot ellipsis
-    if (text.slice(-3) === '...') {
-        return '...' + text.slice(0, -3);
-    }
-    return text;
-}
-// ─── Bidi Isolation ──────────────────────────────────────────────────────────
-/**
- * Unicode bidirectional control characters for explicit direction overrides.
- *
- * These are invisible characters inserted into the text stream.
- * They are widely supported (IE8+) and the most reliable way to force
- * correct bidi rendering in older browsers that do not support the
- * CSS `unicode-bidi` or `direction` properties.
- */
-var BIDI = {
-    /** U+202B  RIGHT-TO-LEFT EMBEDDING — starts an RTL embedding level */
-    RLE: '\u202B',
-    /** U+202A  LEFT-TO-RIGHT EMBEDDING — starts an LTR embedding level */
-    LRE: '\u202A',
-    /** U+202C  POP DIRECTIONAL FORMATTING — ends the current embedding */
-    PDF: '\u202C',
-    /** U+200F  RIGHT-TO-LEFT MARK — a zero-width RTL character */
-    RLM: '\u200F',
-    /** U+200E  LEFT-TO-RIGHT MARK — a zero-width LTR character */
-    LRM: '\u200E',
-    /** U+2067  RIGHT-TO-LEFT ISOLATE (HTML5 / modern browsers only) */
-    RLI: '\u2067',
-    /** U+2066  LEFT-TO-RIGHT ISOLATE (HTML5 / modern browsers only) */
-    LRI: '\u2066',
-    /** U+2069  POP DIRECTIONAL ISOLATE */
-    PDI: '\u2069',
-};
-exports.BIDI = BIDI;
-/**
- * Wraps text with Unicode bidi control characters to force RTL rendering.
- *
- * Uses RLE/PDF (IE8+) with RLM prefix for maximum compatibility.
- * Modern browsers also benefit from the explicit directional markers.
- *
- * @param text - The text to wrap
- * @returns Text wrapped with RTL bidi markers
- *
- * @example
- * wrapRTL("مرحبا") // "\u200F\u202Bمرحبا\u202C"
- */
-function wrapRTL(text) {
-    if (!text)
-        return text;
-    return BIDI.RLM + BIDI.RLE + text + BIDI.PDF;
-}
-/**
- * Wraps text with Unicode bidi control characters to force LTR rendering.
- *
- * Useful for embedding LTR content (e.g. URLs, numbers, code) inside RTL text.
- *
- * @param text - The text to wrap
- * @returns Text wrapped with LTR bidi markers
- *
- * @example
- * wrapLTR("https://example.com") // "\u200E\u202Ahttps://example.com\u202C"
- */
-function wrapLTR(text) {
-    if (!text)
-        return text;
-    return BIDI.LRM + BIDI.LRE + text + BIDI.PDF;
-}
-// ─── CSS Direction Helpers ───────────────────────────────────────────────────
-/**
- * Returns a CSS style object for RTL layout.
- *
- * Apply to any container element to trigger proper RTL rendering.
- * Works in all browsers (IE6+).
- *
- * @returns `{ direction: 'rtl', unicodeBidi: 'embed' }`
- *
- * @example
- * // React
- * <div style={getRTLStyles()}>مرحبا</div>
- *
- * // Vanilla JS
- * Object.assign(el.style, getRTLStyles());
- */
-function getRTLStyles() {
-    return { direction: 'rtl', unicodeBidi: 'embed' };
-}
-/**
- * Returns a CSS style object for LTR layout.
- *
- * @returns `{ direction: 'ltr', unicodeBidi: 'embed' }`
- */
-function getLTRStyles() {
-    return { direction: 'ltr', unicodeBidi: 'embed' };
-}
-/**
- * Sets `dir` and `lang` attributes on a DOM element for correct RTL rendering.
- *
- * This is the most reliable approach for HTML — it activates the browser's
- * built-in bidi algorithm and is respected by screen readers.
- *
- * @param element - The DOM element to configure
- * @param lang    - BCP 47 language tag, e.g. "ar", "he", "fa", "ur"
- *
- * @example
- * setDirAttribute(document.getElementById("content"), "ar");
- * // → <div id="content" dir="rtl" lang="ar">
- */
-function setDirAttribute(element, lang) {
-    element.setAttribute('dir', 'rtl');
-    if (lang)
-        element.setAttribute('lang', lang);
-}
+var arabic_1 = require("./arabic");
+var general_1 = require("./general");
+var persian_1 = require("./persian");
 /**
  * Applies all RTL text fixes at once — the main entry point.
  *
@@ -325,34 +40,59 @@ function setDirAttribute(element, lang) {
  * // "\u200F\u202Bمرحبا\u202C"  (wrapped for plain-text bidi)
  */
 function fixRTL(text, options) {
-    if (!text || !hasRTL(text))
+    if (typeof text !== "string" || !text)
         return text;
     // Support legacy string shorthand: fixRTL(text, "arabic")
     var opts = {};
-    if (typeof options === 'string') {
+    if (typeof options === "string") {
         opts.lang = options;
     }
     else if (options) {
         opts = options;
     }
-    var lang = opts.lang !== undefined ? opts.lang : 'persian';
+    var lang = opts.lang !== undefined ? opts.lang : "persian";
     var doDigits = opts.convertDigits !== undefined ? opts.convertDigits : true;
     var doPunctuation = opts.convertPunctuation !== undefined ? opts.convertPunctuation : true;
     var doEllipsis = opts.fixEllipsis !== undefined ? opts.fixEllipsis : true;
     var doBidiMarkers = opts.addBidiMarkers !== undefined ? opts.addBidiMarkers : false;
+    var doFixBrackets = opts.fixBrackets !== undefined ? opts.fixBrackets : true;
     var result = text;
     if (doDigits) {
-        result = lang === 'arabic' ? toArabicDigits(result) : toPersianDigits(result);
+        result =
+            lang === "arabic" ? (0, arabic_1.toArabicDigits)(result) : (0, persian_1.toPersianDigits)(result);
     }
     if (doPunctuation) {
-        result = convertPunctuation(result);
+        result = (0, general_1.convertPunctuation)(result);
+    }
+    if (doFixBrackets) {
+        result =
+            lang === "arabic" ? (0, arabic_1.fixBracketsArabic)(result) : (0, general_1.fixBrackets)(result);
     }
     if (doEllipsis) {
-        result = moveEllipsis(result);
+        result = (0, general_1.moveEllipsis)(result);
     }
     if (doBidiMarkers) {
-        result = wrapRTL(result);
+        result = (0, general_1.wrapRTL)(result);
     }
     return result;
 }
+var arabic_2 = require("./arabic");
+Object.defineProperty(exports, "fixBracketsArabic", { enumerable: true, get: function () { return arabic_2.fixBracketsArabic; } });
+Object.defineProperty(exports, "toArabicDigits", { enumerable: true, get: function () { return arabic_2.toArabicDigits; } });
+var css_1 = require("./css");
+Object.defineProperty(exports, "getLTRStyles", { enumerable: true, get: function () { return css_1.getLTRStyles; } });
+Object.defineProperty(exports, "getRTLStyles", { enumerable: true, get: function () { return css_1.getRTLStyles; } });
+Object.defineProperty(exports, "setDirAttribute", { enumerable: true, get: function () { return css_1.setDirAttribute; } });
+var general_2 = require("./general");
+Object.defineProperty(exports, "BIDI", { enumerable: true, get: function () { return general_2.BIDI; } });
+Object.defineProperty(exports, "convertPunctuation", { enumerable: true, get: function () { return general_2.convertPunctuation; } });
+Object.defineProperty(exports, "fixBrackets", { enumerable: true, get: function () { return general_2.fixBrackets; } });
+Object.defineProperty(exports, "hasRTL", { enumerable: true, get: function () { return general_2.hasRTL; } });
+Object.defineProperty(exports, "moveEllipsis", { enumerable: true, get: function () { return general_2.moveEllipsis; } });
+Object.defineProperty(exports, "wrapLTR", { enumerable: true, get: function () { return general_2.wrapLTR; } });
+Object.defineProperty(exports, "wrapRTL", { enumerable: true, get: function () { return general_2.wrapRTL; } });
+var hebrew_1 = require("./hebrew");
+Object.defineProperty(exports, "hasHebrew", { enumerable: true, get: function () { return hebrew_1.hasHebrew; } });
+var persian_2 = require("./persian");
+Object.defineProperty(exports, "toPersianDigits", { enumerable: true, get: function () { return persian_2.toPersianDigits; } });
 exports.default = fixRTL;

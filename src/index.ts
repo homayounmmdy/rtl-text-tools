@@ -8,7 +8,6 @@ import { fixBracketsArabic, toArabicDigits } from "./arabic";
 import {
   convertPunctuation,
   fixBrackets,
-  hasRTL,
   moveEllipsis,
   wrapRTL,
 } from "./general";
@@ -91,7 +90,7 @@ export function fixRTL(
   text: string,
   options?: FixRTLOptions | Language,
 ): string {
-  if (!text || !hasRTL(text)) return text;
+  if (typeof text !== "string" || !text) return text;
 
   // Support legacy string shorthand: fixRTL(text, "arabic")
   var opts: FixRTLOptions = {};
