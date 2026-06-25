@@ -307,7 +307,7 @@ export function setDirAttribute(element: HTMLElement, lang: string): void {
 
 // ─── Main API ────────────────────────────────────────────────────────────────
 
-export type Language = 'arabic' | 'persian';
+export type Language = 'arabic' | 'persian' | 'hebrew';
 
 export interface FixRTLOptions {
     /**
@@ -406,4 +406,7 @@ export function fixRTL(text: string, options?: FixRTLOptions | Language): string
 }
 
 export { BIDI };
+export {
+    hasHebrew
+} from './hebrew'
 export default fixRTL;
