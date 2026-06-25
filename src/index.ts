@@ -5,82 +5,14 @@
  * Handles Arabic, Hebrew, Persian, Urdu, Dari, Pashto, and other RTL scripts.
  */
 import { fixBracketsArabic, toArabicDigits } from "./arabic";
-import { fixBrackets, hasRTL, wrapRTL } from "./general";
+import {
+  convertPunctuation,
+  fixBrackets,
+  hasRTL,
+  moveEllipsis,
+  wrapRTL,
+} from "./general";
 import { toPersianDigits } from "./persian";
-
-// ─── Punctuation ─────────────────────────────────────────────────────────────
-
-/**
- * Maps LTR punctuation to their RTL equivalents.
- *
- * NOTE: We replace ALL occurrences (not just the first) using a global regex
- * per character — this is the IE11-safe way to do it since
- * String.prototype.replaceAll() is not available in IE11 or old Safari.
- */
-var PUNCTUATION_MAP: Array<[RegExp, string]> = [
-  [/\?/g, "\u061F"], // ؟  Arabic Question Mark
-  [/,/g, "\u060C"], // ،  Arabic Comma
-  [/;/g, "\u061B"], // ؛  Arabic Semicolon
-];
-
-/**
- * Converts LTR punctuation (`, ; ?`) to their RTL equivalents (`، ؛ ؟`)
- *
- * Only applies to text that contains RTL characters.
- * Replaces ALL occurrences (the original implementation only replaced the first).
- *
- * @param text - The text to convert punctuation in
- * @returns Text with RTL-appropriate punctuation marks
- *
- * @example
- * convertPunctuation("مرحبا, كيف حالك?")   // "مرحبا، كيف حالك؟"
- * convertPunctuation("Hello, world?")      // "Hello, world?" (no RTL = unchanged)
- */
-export function convertPunctuation(text: string): string {
-  if (!text || !hasRTL(text)) return text;
-
-  var result = text;
-  for (var i = 0; i < PUNCTUATION_MAP.length; i++) {
-    result = result.replace(PUNCTUATION_MAP[i][0], PUNCTUATION_MAP[i][1]);
-  }
-  return result;
-}
-
-// ─── Ellipsis ────────────────────────────────────────────────────────────────
-
-/**
- * Moves a trailing ellipsis (`...` or `…`) to the start of RTL text.
- *
- * In RTL languages, truncation ellipsis traditionally appears at the visual
- * start (the right side), which is the logical beginning of the string.
- *
- * Handles both the three-dot sequence `...` and the single Unicode
- * HORIZONTAL ELLIPSIS character `…` (U+2026).
- *
- * @param text - The text to fix ellipsis placement in
- * @returns Text with ellipsis moved to the front if it was at the end
- *
- * @example
- * moveEllipsis("مرحبا...")    // "...مرحبا"
- * moveEllipsis("مرحبا…")     // "…مرحبا"
- * moveEllipsis("مرحبا")       // "مرحبا"
- * moveEllipsis("مرحبا...كيف") // "مرحبا...كيف" (middle = unchanged)
- */
-export function moveEllipsis(text: string): string {
-  if (!text || !hasRTL(text)) return text;
-
-  // Unicode ellipsis character (U+2026)
-  if (text.charAt(text.length - 1) === "\u2026") {
-    return "\u2026" + text.slice(0, -1);
-  }
-
-  // Three-dot ellipsis
-  if (text.slice(-3) === "...") {
-    return "..." + text.slice(0, -3);
-  }
-
-  return text;
-}
 
 // ─── Main API ────────────────────────────────────────────────────────────────
 
@@ -207,7 +139,15 @@ export function fixRTL(
 
 export { fixBracketsArabic, toArabicDigits } from "./arabic";
 export { getLTRStyles, getRTLStyles, setDirAttribute } from "./css";
-export { BIDI, fixBrackets, hasRTL, wrapLTR, wrapRTL } from "./general";
+export {
+  BIDI,
+  convertPunctuation,
+  fixBrackets,
+  hasRTL,
+  moveEllipsis,
+  wrapLTR,
+  wrapRTL,
+} from "./general";
 export { hasHebrew } from "./hebrew";
 export { toPersianDigits } from "./persian";
 
