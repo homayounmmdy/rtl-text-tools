@@ -4,8 +4,9 @@
  * Supports: IE11+, Edge, Firefox, Chrome, Safari, all modern browsers.
  * Handles Arabic, Hebrew, Persian, Urdu, Dari, Pashto, and other RTL scripts.
  */
-import { fixBracketsArabic } from "./arabic";
+import { fixBracketsArabic, toArabicDigits } from "./arabic";
 import { fixBrackets } from "./general";
+import { toPersianDigits } from "./persian";
 // ─── RTL Detection ───────────────────────────────────────────────────────────
 
 /**
@@ -73,70 +74,6 @@ var RTL_REGEX = /[\u0590-\u05FF\u0600-\u08FF\uFB1D-\uFDFF\uFE70-\uFEFF]/;
 export function hasRTL(text: string): boolean {
   if (!text) return false;
   return RTL_REGEX.test(text);
-}
-
-// ─── Digit Conversion ────────────────────────────────────────────────────────
-
-var ARABIC_DIGITS: Record<string, string> = {
-  "0": "\u0660",
-  "1": "\u0661",
-  "2": "\u0662",
-  "3": "\u0663",
-  "4": "\u0664",
-  "5": "\u0665",
-  "6": "\u0666",
-  "7": "\u0667",
-  "8": "\u0668",
-  "9": "\u0669",
-};
-
-var PERSIAN_DIGITS: Record<string, string> = {
-  "0": "\u06F0",
-  "1": "\u06F1",
-  "2": "\u06F2",
-  "3": "\u06F3",
-  "4": "\u06F4",
-  "5": "\u06F5",
-  "6": "\u06F6",
-  "7": "\u06F7",
-  "8": "\u06F8",
-  "9": "\u06F9",
-};
-
-/**
- * Converts Latin digits (0-9) to Arabic-Indic numerals (٠-٩)
- *
- * Used for Arabic, Egyptian, and most Middle Eastern locales.
- *
- * @param text - Text containing Latin digits to convert
- * @returns Text with Arabic-Indic numerals
- *
- * @example
- * toArabicDigits("Price 123") // "Price ١٢٣"
- */
-export function toArabicDigits(text: string): string {
-  if (!text) return text;
-  return text.replace(/[0-9]/g, function (d) {
-    return ARABIC_DIGITS[d];
-  });
-}
-
-/**
- * Converts Latin digits (0-9) to Extended Persian numerals (۰-۹)
- *
- * Used for Persian (Farsi), Urdu, Dari, and Pashto locales.
- *
- * @param text - Text containing Latin digits to convert
- * @returns Text with Persian-Indic numerals
- *
- * @example
- * toPersianDigits("Price 123") // "Price ۱۲۳"
- */
-export function toPersianDigits(text: string): string {
-  if (!text) return text;
-  return text.replace(/[0-9]/g, function (d) {
-    return PERSIAN_DIGITS[d];
-  });
 }
 
 // ─── Punctuation ─────────────────────────────────────────────────────────────
@@ -446,9 +383,10 @@ export function fixRTL(
   return result;
 }
 
-export { fixBracketsArabic } from "./arabic";
+export { fixBracketsArabic, toArabicDigits } from "./arabic";
 export { fixBrackets } from "./general";
 export { hasHebrew } from "./hebrew";
+export { toPersianDigits } from "./persian";
 export { BIDI };
 
 export default fixRTL;
