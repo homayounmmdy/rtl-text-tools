@@ -3,21 +3,24 @@
 [![npm version](https://badge.fury.io/js/rtl-text-tools.svg)](https://www.npmjs.com/package/rtl-text-tools)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-A complete text processing toolkit for RTL (Right-to-Left) languages. Fix ellipsis, punctuation, digit conversion, bidi wrapping, and CSS helpers — for Arabic, Hebrew, Persian, Urdu, and other RTL scripts.
+A complete text processing toolkit for RTL (Right-to-Left) languages. Fix ellipsis, punctuation, digit conversion, brackets, bidi wrapping, and CSS helpers — for Arabic, Hebrew, Persian, Urdu, and other RTL scripts.
 
-Works back to **IE11** with zero runtime dependencies.
+Works back to **IE11** with zero runtime dependencies. Fully tested and optimized for maximum browser compatibility.
 
 ## 📜 Features
 
-- ✅ **RTL Detection** — Identify if text contains RTL characters (Arabic, Hebrew, Persian, Syriac, Thaana, N'Ko, and more)
+- ✅ **RTL Detection** — Identify if text contains RTL characters (Arabic, Persian, Syriac, Thaana, N'Ko, and more)
+- ✅ **Hebrew Detection** — Specifically detect Hebrew characters with `hasHebrew`
 - ✅ **Direction Normalization** — Fix mixed RTL/LTR text readability issues
 - ✅ **Digit Conversion** — Convert Latin digits to Persian (`۰–۹`) or Arabic-Indic (`٠–٩`) numerals
 - ✅ **Punctuation Conversion** — Convert `, ; ?` to their RTL equivalents `، ؛ ؟` — all occurrences
+- ✅ **Bracket Fixing** — Convert and fix brackets for Arabic and general RTL contexts
 - ✅ **Ellipsis Fixing** — Move trailing `...` or `…` to the start of RTL text
 - ✅ **Bidi Markers** — Wrap text with Unicode RLE/PDF control characters for plain-text contexts
 - ✅ **CSS Helpers** — Ready-to-use `{ direction, unicodeBidi }` style objects
 - ✅ **DOM Helper** — Set `dir` and `lang` attributes on elements
 - ✅ **Text Normalization** — Comprehensive RTL text processing
+- ✅ **Fully Tested** — Comprehensive test coverage for all source code
 
 ## 🚀 Installation
 
@@ -74,9 +77,11 @@ fixRTL(text, {
 ```typescript
 import {
   hasRTL,
+  hasHebrew,
   toArabicDigits,
   toPersianDigits,
   convertPunctuation,
+  fixBracket,
   moveEllipsis,
   normalizeDirection,
   wrapRTL,
@@ -91,12 +96,19 @@ hasRTL('مرحبا')   // true
 hasRTL('Hello')   // false
 hasRTL('שלום')    // true
 
+hasHebrew('שלום') // true
+hasHebrew('مرحبا') // false
+
 // Digit conversion
 toArabicDigits('Price 123')   // 'Price ١٢٣'
 toPersianDigits('Price 123')  // 'Price ۱۲۳'
 
 // Punctuation
 convertPunctuation('مرحبا, كيف حالك?')  // 'مرحبا، كيف حالك؟'
+
+// Bracket fixing
+fixBracket('Hello (world)') // Fixes brackets for general RTL
+fixBracket('مرحبا (بالعالم)', 'arabic') // Fixes brackets specifically for Arabic
 
 // Ellipsis (supports both ... and the Unicode … character)
 moveEllipsis('مرحبا...')  // '...مرحبا'
@@ -165,6 +177,10 @@ Returns `true` if the text contains RTL characters.
 - RTL Presentation Forms: `\uFB1D-\uFDFF`, `\uFE70-\uFEFC`
 - Syriac, Thaana, N'Ko, Samaritan, Mandaic
 
+### `hasHebrew(text: string): boolean`
+
+Returns `true` if the text specifically contains Hebrew characters.
+
 ### `normalizeDirection(text: string): string`
 
 Wraps text with RTL embedding controls for proper readability of mixed RTL/LTR content.
@@ -208,6 +224,18 @@ Converts LTR punctuation marks to their RTL equivalents when RTL text is present
 
 Returns the original string unchanged if no RTL characters are present.
 
+### `fixBracket(text: string, type?: 'general' | 'arabic'): string`
+
+Fixes and converts brackets in RTL text.
+- `'general'` (default): Ensures brackets are correctly ordered and rendered for general RTL text.
+- `'arabic'`: Converts brackets to Arabic-specific equivalents (e.g., `﴿ ﴾`, `« »`) where appropriate.
+
+**Example:**
+```typescript
+fixBracket('Hello (world)') // General RTL bracket fixing
+fixBracket('مرحبا (بالعالم)', 'arabic') // Arabic-specific bracket conversion
+```
+
 ### `moveEllipsis(text: string): string`
 
 Moves a trailing `...` or `…` (U+2026) to the beginning of RTL text.
@@ -235,7 +263,9 @@ Sets `dir="rtl"` and the given `lang` attribute on any element with `setAttribut
 
 ### `fixRTL(text: string, options?: FixRTLOptions | string): string`
 
-**Main function** - Applies all RTL text fixes at once:
+**Main function** - Applies all RTL text fixes at once. 
+
+*Note: As of v1.1.0, `fixRTL` has been made stricter and more precise, ensuring transformations are only applied when strictly necessary to prevent over-processing.*
 
 ```typescript
 interface FixRTLOptions {
@@ -284,13 +314,21 @@ Also accepts a plain language string for shorthand: `fixRTL(text, 'arabic')`.
 | iOS Safari | 3.2+ |
 | Android WebView | 2.1+ |
 
-The compiled output targets ES5: `var`, regular functions, no arrow functions, no `const/let`. All regex uses plain `\uXXXX` BMP escapes — the ES6 `u` flag is never used. `String.replaceAll()` is never used.
+The compiled output targets ES5: `var`, regular functions, no arrow functions, no `const/let`. All regex uses plain `\uXXXX` BMP escapes — the ES6 `u` flag is never used. `String.replaceAll()` is never used. Further optimized in v1.1.0 for maximum legacy browser compatibility.
 
 ---
 
 ## 🔄 Version History
 
-### v1.0.0 (Current)
+### v1.1.0 (Current)
+- 🏗️ **Major Refactor** — Complete codebase refactoring and structural improvements (no breaking API changes)
+- 🧪 **Full Test Coverage** — Added comprehensive tests for all code in `src`
+- ✨ Added `hasHebrew` — Dedicated function to detect Hebrew characters
+- ✨ Added `fixBracket` — Fix and convert brackets for Arabic and general RTL contexts
+- 🐛 **Stricter `fixRTL`** — Improved `fixRTL` to be stricter and more precise in its transformations
+- 🖥️ **Enhanced Compatibility** — Further optimized code for maximum compatibility with old browsers (IE11+)
+
+### v1.0.0
 - ✨ Added `wrapRTL` / `wrapLTR` — Unicode bidi markers for plain-text contexts
 - ✨ Added `getRTLStyles` / `getLTRStyles` — CSS style objects for React and vanilla JS
 - ✨ Added `setDirAttribute` — DOM `dir`/`lang` helper; uses structural typing, no DOM lib required
