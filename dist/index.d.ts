@@ -4,6 +4,7 @@ export interface FixRTLOptions {
      * Target language. Controls which digit set is used.
      * - `"arabic"`  → Arabic-Indic digits ٠١٢٣٤٥٦٧٨٩  (default for Arabic locales)
      * - `"persian"` → Extended Persian digits ۰۱۲۳۴۵۶۷۸۹  (default)
+     * - `"hebrew"`  → Keeps standard Latin digits (0-9)
      */
     lang?: Language;
     /**
@@ -63,6 +64,9 @@ export interface FixRTLOptions {
  *
  * fixRTL("Hello, world!")
  * // "Hello, world!"  (no RTL characters → unchanged)
+ *
+ * fixRTL("שלום 123", { lang: "hebrew" })
+ * // "שלום 123"  (Hebrew keeps standard Latin digits)
  *
  * fixRTL("مرحبا", { addBidiMarkers: true })
  * // "\u200F\u202Bمرحبا\u202C"  (wrapped for plain-text bidi)

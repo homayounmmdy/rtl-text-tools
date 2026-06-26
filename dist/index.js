@@ -36,11 +36,17 @@ var persian_1 = require("./persian");
  * fixRTL("Hello, world!")
  * // "Hello, world!"  (no RTL characters → unchanged)
  *
+ * fixRTL("שלום 123", { lang: "hebrew" })
+ * // "שלום 123"  (Hebrew keeps standard Latin digits)
+ *
  * fixRTL("مرحبا", { addBidiMarkers: true })
  * // "\u200F\u202Bمرحبا\u202C"  (wrapped for plain-text bidi)
  */
 function fixRTL(text, options) {
     if (typeof text !== "string" || !text)
+        return text;
+    // STRICT ENFORCEMENT: Return unchanged if there are no RTL characters
+    if (!(0, general_1.hasRTL)(text))
         return text;
     // Support legacy string shorthand: fixRTL(text, "arabic")
     var opts = {};
@@ -58,8 +64,13 @@ function fixRTL(text, options) {
     var doFixBrackets = opts.fixBrackets !== undefined ? opts.fixBrackets : true;
     var result = text;
     if (doDigits) {
-        result =
-            lang === "arabic" ? (0, arabic_1.toArabicDigits)(result) : (0, persian_1.toPersianDigits)(result);
+        if (lang === "arabic") {
+            result = (0, arabic_1.toArabicDigits)(result);
+        }
+        else if (lang === "persian") {
+            result = (0, persian_1.toPersianDigits)(result);
+        }
+        // If lang === "hebrew", do nothing (keeps standard 0-9 digits)
     }
     if (doPunctuation) {
         result = (0, general_1.convertPunctuation)(result);
@@ -76,6 +87,7 @@ function fixRTL(text, options) {
     }
     return result;
 }
+// ─── Re-exports ──────────────────────────────────────────────────────────────
 var arabic_2 = require("./arabic");
 Object.defineProperty(exports, "fixBracketsArabic", { enumerable: true, get: function () { return arabic_2.fixBracketsArabic; } });
 Object.defineProperty(exports, "toArabicDigits", { enumerable: true, get: function () { return arabic_2.toArabicDigits; } });
