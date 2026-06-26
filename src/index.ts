@@ -8,6 +8,7 @@ import { fixBracketsArabic, toArabicDigits } from "./arabic";
 import {
   convertPunctuation,
   fixBrackets,
+  hasRTL,
   moveEllipsis,
   wrapRTL,
 } from "./general";
@@ -22,6 +23,7 @@ export interface FixRTLOptions {
    * Target language. Controls which digit set is used.
    * - `"arabic"`  → Arabic-Indic digits ٠١٢٣٤٥٦٧٨٩  (default for Arabic locales)
    * - `"persian"` → Extended Persian digits ۰۱۲۳۴۵۶۷۸۹  (default)
+   * - `"hebrew"`  → Keeps standard Latin digits (0-9)
    */
   lang?: Language;
   /**
@@ -83,6 +85,9 @@ export interface FixRTLOptions {
  * fixRTL("Hello, world!")
  * // "Hello, world!"  (no RTL characters → unchanged)
  *
+ * fixRTL("שלום 123", { lang: "hebrew" })
+ * // "שלום 123"  (Hebrew keeps standard Latin digits)
+ *
  * fixRTL("مرحبا", { addBidiMarkers: true })
  * // "\u200F\u202Bمرحبا\u202C"  (wrapped for plain-text bidi)
  */
@@ -91,6 +96,9 @@ export function fixRTL(
   options?: FixRTLOptions | Language,
 ): string {
   if (typeof text !== "string" || !text) return text;
+
+  // STRICT ENFORCEMENT: Return unchanged if there are no RTL characters
+  if (!hasRTL(text)) return text;
 
   // Support legacy string shorthand: fixRTL(text, "arabic")
   var opts: FixRTLOptions = {};
@@ -112,8 +120,12 @@ export function fixRTL(
   var result = text;
 
   if (doDigits) {
-    result =
-      lang === "arabic" ? toArabicDigits(result) : toPersianDigits(result);
+    if (lang === "arabic") {
+      result = toArabicDigits(result);
+    } else if (lang === "persian") {
+      result = toPersianDigits(result);
+    }
+    // If lang === "hebrew", do nothing (keeps standard 0-9 digits)
   }
 
   if (doPunctuation) {
@@ -135,6 +147,8 @@ export function fixRTL(
 
   return result;
 }
+
+// ─── Re-exports ──────────────────────────────────────────────────────────────
 
 export { fixBracketsArabic, toArabicDigits } from "./arabic";
 export { getLTRStyles, getRTLStyles, setDirAttribute } from "./css";
