@@ -50,6 +50,9 @@
     "ts-jest": "^29.4.11",
     "typescript": "^5.9.3"
   },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
+  },
   "files": [
     "dist/**/*",
     "README.md",
