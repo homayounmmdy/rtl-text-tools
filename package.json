@@ -4,11 +4,19 @@
   "description": "Cross-browser RTL text utility — fixes digits, punctuation, ellipsis, and bidi markers for Arabic, Hebrew, Persian, Urdu, and other RTL scripts. Supports IE11+.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "sideEffects": false,
   "scripts": {
     "build": "rimraf dist && tsc",
     "test": "jest",
     "test:watch": "jest --watch",
-    "prepare": "npm run build"
+    "prepare": "npm run build",
+    "prepublishOnly": "npm test && npm run build"
   },
   "keywords": [
     "rtl",
@@ -51,10 +59,13 @@
     "typescript": "^5.9.3"
   },
   "publishConfig": {
-    "registry": "https://npm.pkg.github.com"
+    "access": "public"
   },
   "files": [
-    "dist/**/*",
+    "dist",
+    "CHANGELOG.md",
+    "CODE_OF_CONDUCT.md",
+    "CONTRIBUTING.md",
     "README.md",
     "LICENSE"
   ]
