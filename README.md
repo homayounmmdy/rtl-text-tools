@@ -357,6 +357,10 @@ The compiled output targets ES5: `var`, regular functions, no arrow functions, n
 Contributions, issues, and feature requests are welcome!  
 Please check out the [Contributing Guide](./CONTRIBUTING.md) for details.
 
+## 📜 Code of Conduct
+
+Please note that this project is released with a [Contributor Code of Conduct](./CODE_OF_CONDUCT.md). By participating in this project you agree to abide by its terms.
+
 ## 🐛 Issues
 
 Found a bug or have a suggestion? Please open an issue on [GitHub](https://github.com/homayounmmdy/rtl-text-tools/issues).
