@@ -4,7 +4,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![npm downloads](https://img.shields.io/npm/dt/rtl-text-tools.svg)](https://www.npmjs.com/package/rtl-text-tools)
 
-A complete text processing toolkit for RTL (Right-to-Left) languages. Fix ellipsis, punctuation, digit conversion, brackets, bidi wrapping, and CSS helpers — for Arabic, Hebrew, Persian, Urdu, and other RTL scripts.
+A complete text processing toolkit for RTL (Right-to-Left) languages. Fix ellipsis, punctuation, digit conversion, brackets, bidi wrapping, and CSS helpers for Arabic, Hebrew, Persian, Urdu, and other RTL scripts.
 
 Works back to **IE11** with zero runtime dependencies. Fully tested and optimized for maximum browser compatibility.
 
@@ -14,7 +14,7 @@ Works back to **IE11** with zero runtime dependencies. Fully tested and optimize
 - ✅ **Hebrew Detection** — Specifically detect Hebrew characters with `hasHebrew`
 - ✅ **Direction Normalization** — Fix mixed RTL/LTR text readability issues
 - ✅ **Digit Conversion** — Convert Latin digits to Persian (`۰–۹`) or Arabic-Indic (`٠–٩`) numerals
-- ✅ **Punctuation Conversion** — Convert `, ; ?` to their RTL equivalents `، ؛ ؟` — all occurrences
+- ✅ **Punctuation Conversion** — Convert `, ; ?` to their RTL equivalents `، ؛ ؟`  all occurrences
 - ✅ **Bracket Fixing** — Convert and fix brackets for Arabic and general RTL contexts
 - ✅ **Ellipsis Fixing** — Move trailing `...` or `…` to the start of RTL text
 - ✅ **Bidi Markers** — Wrap text with Unicode RLE/PDF control characters for plain-text contexts
@@ -44,7 +44,7 @@ pnpm add rtl-text-tools
 
 ## 📖 Usage
 
-### Quick start — `fixRTL()`
+### Quick start `fixRTL()`
 
 ```typescript
 import { fixRTL } from 'rtl-text-tools';
@@ -162,8 +162,6 @@ setDirAttribute(document.getElementById('article'), 'ar');
 // → <div id="article" dir="rtl" lang="ar">
 ```
 
----
-
 ## 🔧 API
 
 ### `hasRTL(text: string): boolean`
@@ -252,7 +250,7 @@ Wraps text with `LRM + LRE … PDF` Unicode bidi control characters. Useful for 
 
 ### `getRTLStyles(): { direction: string; unicodeBidi: string }`
 
-Returns `{ direction: 'rtl', unicodeBidi: 'embed' }` — ready for React inline styles or `Object.assign(el.style, ...)`.
+Returns `{ direction: 'rtl', unicodeBidi: 'embed' }` ready for React inline styles or `Object.assign(el.style, ...)`.
 
 ### `getLTRStyles(): { direction: string; unicodeBidi: string }`
 
@@ -260,7 +258,7 @@ Returns `{ direction: 'ltr', unicodeBidi: 'embed' }`.
 
 ### `setDirAttribute(element: AttributeSettable, lang: string): void`
 
-Sets `dir="rtl"` and the given `lang` attribute on any element with `setAttribute`. Accepts `HTMLElement`, `SVGElement`, or any structurally compatible object — no DOM lib required in your tsconfig.
+Sets `dir="rtl"` and the given `lang` attribute on any element with `setAttribute`. Accepts `HTMLElement`, `SVGElement`, or any structurally compatible object  no DOM lib required in your tsconfig.
 
 ### `fixRTL(text: string, options?: FixRTLOptions | string): string`
 
@@ -284,8 +282,6 @@ Also accepts a plain language string for shorthand: `fixRTL(text, 'arabic')`.
 - Processed string with all fixes applied
 - Original string unchanged if no RTL characters are present
 
----
-
 ## 🌍 Supported RTL Languages
 
 - Arabic (العربية)
@@ -301,8 +297,6 @@ Also accepts a plain language string for shorthand: `fixRTL(text, 'arabic')`.
 - Samaritan
 - Mandaic
 
----
-
 ## 🖥️ Browser Compatibility
 
 | Browser | Version |
@@ -315,9 +309,7 @@ Also accepts a plain language string for shorthand: `fixRTL(text, 'arabic')`.
 | iOS Safari | 3.2+ |
 | Android WebView | 2.1+ |
 
-The compiled output targets ES5: `var`, regular functions, no arrow functions, no `const/let`. All regex uses plain `\uXXXX` BMP escapes — the ES6 `u` flag is never used. `String.replaceAll()` is never used. Further optimized in v1.1.0 for maximum legacy browser compatibility.
-
----
+The compiled output targets ES5: `var`, regular functions, no arrow functions, no `const/let`. All regex uses plain `\uXXXX` BMP escapes the ES6 `u` flag is never used. `String.replaceAll()` is never used. Further optimized in v1.1.0 for maximum legacy browser compatibility.
 
 ## 🔄 Changelog
 
