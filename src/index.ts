@@ -12,7 +12,7 @@ import {
     moveEllipsis,
     wrapRTL,
 } from "./general";
-import {normalizePersianChars, toPersianDecimal, toPersianDigits} from "./persian";
+import {normalizePersianChars, normalizeTehMarbuta, toPersianDecimal, toPersianDigits} from "./persian";
 import {fixHebrewFinalForms, normalizeHebrewQuotes, normalizeMaqaf} from "./hebrew";
 
 // ─── Main API ────────────────────────────────────────────────────────────────
@@ -85,6 +85,14 @@ export interface FixRTLOptions {
      * @default true
      */
     normalizePersianChars?: boolean;
+
+    /**
+     * Convert Arabic Teh Marbuta (ة) to Persian Heh (ه).
+     * Highly recommended for Farsi text.
+     * Only applies when lang === "persian".
+     * @default true
+     */
+    normalizeTehMarbuta?: boolean;
 }
 
 /**
@@ -146,6 +154,7 @@ export function fixRTL(
     var doFixBrackets = opts.fixBrackets !== undefined ? opts.fixBrackets : true;
     var doChars = opts.normalizePersianChars !== undefined ? opts.normalizePersianChars : true;
     var doDecimal = opts.fixPersianDecimal !== undefined ? opts.fixPersianDecimal : false;
+    var doTehMarbuta = opts.normalizeTehMarbuta !== undefined ? opts.normalizeTehMarbuta : true;
 
     var result = text;
 
@@ -176,6 +185,7 @@ export function fixRTL(
         if (doDecimal) {
             result = toPersianDecimal(result);
         }
+        if (doTehMarbuta) result = normalizeTehMarbuta(result);
     }
 
     if (doFixBrackets) {
@@ -208,6 +218,6 @@ export {
     wrapRTL,
 } from "./general";
 export {hasHebrew, fixHebrewFinalForms, normalizeMaqaf, normalizeHebrewQuotes} from "./hebrew";
-export {toPersianDigits, normalizePersianChars,toPersianDecimal} from "./persian";
+export {toPersianDigits, normalizePersianChars, toPersianDecimal, normalizeTehMarbuta} from "./persian";
 
 export default fixRTL;

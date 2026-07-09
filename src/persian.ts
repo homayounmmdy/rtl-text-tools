@@ -30,6 +30,19 @@ export function toPersianDecimal(text: string): string {
   return text.replace(/([0-9])\.([0-9])/g, '$1\u066B$2');
 }
 
+// ─── Persian Deep Normalization ──────────────────────────────────────────────
+/**
+ * Converts Arabic Teh Marbuta (ة) to Persian Heh (ه).
+ *
+ * In Persian, words that end in "eh" sound (like رساله or نامه)
+ * must use the standard Heh. Teh Marbuta is strictly Arabic and
+ * breaks Persian font rendering and spellcheckers.
+ */
+export function normalizeTehMarbuta(text: string): string {
+  if (!text) return text;
+  return text.replace(/\u0629/g, '\u0647'); // ة -> ه
+}
+
 // ─── Digit Conversion ────────────────────────────────────────────────────────
 
 var PERSIAN_DIGITS: Record<string, string> = {
