@@ -1,4 +1,4 @@
-// ─── Persian Typography ───────────────────────────────
+// ─── Persian Typography & Number Normalization ───────────────────────────────
 
 /**
  * Normalizes Arabic letters that are commonly mistyped instead of their Persian equivalents.
@@ -16,6 +16,18 @@ export function normalizePersianChars(text: string): string {
   return text
       .replace(/\u064A/g, '\u06CC') // Arabic Yeh -> Persian Yeh
       .replace(/\u0643/g, '\u06A9'); // Arabic Kaf -> Persian Kaf
+}
+
+/**
+ * Converts standard Latin decimal dots to the Persian Momayyez (٫).
+ *
+ * ONLY replaces the dot if it is strictly between two digits (e.g., "12.5").
+ * This prevents breaking URLs, file extensions, or IP addresses.
+ */
+export function toPersianDecimal(text: string): string {
+  if (!text) return text;
+
+  return text.replace(/([0-9])\.([0-9])/g, '$1\u066B$2');
 }
 
 // ─── Digit Conversion ────────────────────────────────────────────────────────

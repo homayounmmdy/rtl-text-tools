@@ -12,7 +12,7 @@ import {
     moveEllipsis,
     wrapRTL,
 } from "./general";
-import {normalizePersianChars, toPersianDigits} from "./persian";
+import {normalizePersianChars, toPersianDecimal, toPersianDigits} from "./persian";
 import {fixHebrewFinalForms, normalizeHebrewQuotes, normalizeMaqaf} from "./hebrew";
 
 // ─── Main API ────────────────────────────────────────────────────────────────
@@ -70,6 +70,13 @@ export interface FixRTLOptions {
      * @default false
      */
     normalizeHebrewTypography?: boolean;
+
+    /**
+     * Convert Latin decimal dots (.) to the Persian Momayyez (٫) between digits.
+     * Only applies when lang === "persian".
+     * @default false
+     */
+    fixPersianDecimal?: boolean;
 
     /**
      * Normalize Arabic Yeh/Kaf to Persian Yeh/Kaf.
@@ -138,6 +145,7 @@ export function fixRTL(
         opts.addBidiMarkers !== undefined ? opts.addBidiMarkers : false;
     var doFixBrackets = opts.fixBrackets !== undefined ? opts.fixBrackets : true;
     var doChars = opts.normalizePersianChars !== undefined ? opts.normalizePersianChars : true;
+    var doDecimal = opts.fixPersianDecimal !== undefined ? opts.fixPersianDecimal : false;
 
     var result = text;
 
@@ -164,6 +172,9 @@ export function fixRTL(
     if (lang === "persian") {
         if (doChars) {
             result = normalizePersianChars(result);
+        }
+        if (doDecimal) {
+            result = toPersianDecimal(result);
         }
     }
 
@@ -197,6 +208,6 @@ export {
     wrapRTL,
 } from "./general";
 export {hasHebrew, fixHebrewFinalForms, normalizeMaqaf, normalizeHebrewQuotes} from "./hebrew";
-export {toPersianDigits,normalizePersianChars} from "./persian";
+export {toPersianDigits, normalizePersianChars,toPersianDecimal} from "./persian";
 
 export default fixRTL;
