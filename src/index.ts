@@ -13,7 +13,7 @@ import {
   wrapRTL,
 } from "./general";
 import { toPersianDigits } from "./persian";
-import {normalizeMaqaf} from "./hebrew";
+import {fixHebrewFinalForms, normalizeMaqaf} from "./hebrew";
 
 // ─── Main API ────────────────────────────────────────────────────────────────
 
@@ -130,6 +130,7 @@ export function fixRTL(
   }
 
   if (lang !== "hebrew") {
+    result = fixHebrewFinalForms(result);
     result = normalizeMaqaf(result);
   }else {
     result = convertPunctuation(result);
@@ -164,7 +165,7 @@ export {
   wrapLTR,
   wrapRTL,
 } from "./general";
-export { hasHebrew, normalizeMaqaf } from "./hebrew";
+export { hasHebrew,fixHebrewFinalForms, normalizeMaqaf } from "./hebrew";
 export { toPersianDigits } from "./persian";
 
 export default fixRTL;
