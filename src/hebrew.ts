@@ -1,3 +1,19 @@
+/**
+ * Normalizes Hebrew hyphens to Maqaf (־).
+ *
+ * ONLY replaces standard hyphens (-) if they are strictly between two Hebrew letters.
+ * This prevents breaking URLs, phone numbers, or English compound words.
+ *
+ * @param text - The text to normalize
+ * @returns Text with Maqaf hyphens
+ */
+export function normalizeMaqaf(text: string): string {
+  if (!text || !hasHebrew(text)) return text;
+
+  // Replace hyphen with Maqaf (\u05BE) ONLY if strictly between two Hebrew letters
+  return text.replace(/([\u05D0-\u05EA\u05F0-\u05F2])-([\u05D0-\u05EA\u05F0-\u05F2])/g, '$1\u05BE$2');
+}
+
 // ─── Hebrew Detection & Language Identification ─────────────────────────────
 
 /**
