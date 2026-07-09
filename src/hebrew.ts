@@ -69,6 +69,30 @@ export function normalizeMaqaf(text: string): string {
   // Replace hyphen with Maqaf (\u05BE) ONLY if strictly between two Hebrew letters
   return text.replace(/([\u05D0-\u05EA\u05F0-\u05F2])-([\u05D0-\u05EA\u05F0-\u05F2])/g, '$1\u05BE$2');
 }
+/**
+ * Normalizes standard quotes to Hebrew Geresh (׳) and Gershayim (״).
+ *
+ * ONLY replaces quotes if they are adjacent to Hebrew letters.
+ * This prevents breaking English contractions (like "don't") or code snippets.
+ *
+ * @param text - The text to normalize
+ * @returns Text with Geresh and Gershayim
+ */
+export function normalizeHebrewQuotes(text: string): string {
+  if (!text || !hasHebrew(text)) return text;
+
+  // Single quote -> Geresh (\u05F3)
+  text = text.replace(/([\u05D0-\u05EA\u05F0-\u05F2])'([\u05D0-\u05EA\u05F0-\u05F2])/g, '$1\u05F3$2');
+  text = text.replace(/([\u05D0-\u05EA\u05F0-\u05F2])'(\s|$)/g, '$1\u05F3$2');
+  text = text.replace(/(\s|^)'([\u05D0-\u05EA\u05F0-\u05F2])/g, '$1\u05F3$2');
+
+  // Double quote -> Gershayim (\u05F4)
+  text = text.replace(/([\u05D0-\u05EA\u05F0-\u05F2])"([\u05D0-\u05EA\u05F0-\u05F2])/g, '$1\u05F4$2');
+  text = text.replace(/([\u05D0-\u05EA\u05F0-\u05F2])"(\s|$)/g, '$1\u05F4$2');
+  text = text.replace(/(\s|^)"([\u05D0-\u05EA\u05F0-\u05F2])/g, '$1\u05F4$2');
+
+  return text;
+}
 
 // ─── Hebrew Detection & Language Identification ─────────────────────────────
 

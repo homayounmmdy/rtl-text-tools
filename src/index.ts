@@ -13,7 +13,7 @@ import {
   wrapRTL,
 } from "./general";
 import { toPersianDigits } from "./persian";
-import {fixHebrewFinalForms, normalizeMaqaf} from "./hebrew";
+import {fixHebrewFinalForms, normalizeHebrewQuotes, normalizeMaqaf} from "./hebrew";
 
 // ─── Main API ────────────────────────────────────────────────────────────────
 
@@ -59,6 +59,17 @@ export interface FixRTLOptions {
    * @default true
    */
   fixBrackets?: boolean;
+
+  /**
+   * Normalize Hebrew typography (Maqaf hyphens, Geresh/Gershayim quotes).
+   * Only applies when lang === "hebrew".
+   *
+   * Note: Final Forms (Sofit) are ALWAYS normalized for Hebrew automatically
+   * because it is 100% safe and deterministic.
+   *
+   * @default false
+   */
+  normalizeHebrewTypography?: boolean;
 }
 
 /**
@@ -110,6 +121,7 @@ export function fixRTL(
   }
 
   var lang = opts.lang !== undefined ? opts.lang : "persian";
+  var doTypography = opts.normalizeHebrewTypography !== undefined ? opts.normalizeHebrewTypography : false;
   var doDigits = opts.convertDigits !== undefined ? opts.convertDigits : true;
   var doPunctuation =
     opts.convertPunctuation !== undefined ? opts.convertPunctuation : true;
@@ -129,10 +141,14 @@ export function fixRTL(
     // If lang === "hebrew", do nothing (keeps standard 0-9 digits)
   }
 
-  if (lang !== "hebrew") {
+  if (lang === "hebrew") {
     result = fixHebrewFinalForms(result);
-    result = normalizeMaqaf(result);
-  }else {
+
+    if (doTypography) {
+      result = normalizeMaqaf(result);
+      result = normalizeHebrewQuotes(result);
+    }
+  } else {
     result = convertPunctuation(result);
   }
 
@@ -165,7 +181,7 @@ export {
   wrapLTR,
   wrapRTL,
 } from "./general";
-export { hasHebrew,fixHebrewFinalForms, normalizeMaqaf } from "./hebrew";
+export { hasHebrew,fixHebrewFinalForms, normalizeMaqaf,normalizeHebrewQuotes } from "./hebrew";
 export { toPersianDigits } from "./persian";
 
 export default fixRTL;
