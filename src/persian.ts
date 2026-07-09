@@ -1,3 +1,23 @@
+// ─── Persian Typography ───────────────────────────────
+
+/**
+ * Normalizes Arabic letters that are commonly mistyped instead of their Persian equivalents.
+ *
+ * Arabic keyboards often output:
+ * - Arabic Yeh (ي - U+064A) instead of Persian Yeh (ی - U+06CC)
+ * - Arabic Kaf (ك - U+0643) instead of Persian Kaf (ک - U+06A9)
+ *
+ * This causes rendering issues in Iranian fonts where the Arabic letters
+ * look completely out of place or break cursive connections.
+ */
+export function normalizePersianChars(text: string): string {
+  if (!text) return text;
+
+  return text
+      .replace(/\u064A/g, '\u06CC') // Arabic Yeh -> Persian Yeh
+      .replace(/\u0643/g, '\u06A9'); // Arabic Kaf -> Persian Kaf
+}
+
 // ─── Digit Conversion ────────────────────────────────────────────────────────
 
 var PERSIAN_DIGITS: Record<string, string> = {
