@@ -128,7 +128,7 @@ export function fixRTL(
     // If lang === "hebrew", do nothing (keeps standard 0-9 digits)
   }
 
-  if (doPunctuation) {
+  if (doPunctuation && lang !== "hebrew") {
     result = convertPunctuation(result);
   }
 

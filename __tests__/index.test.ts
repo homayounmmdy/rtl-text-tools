@@ -29,10 +29,24 @@ describe('fixRTL (Main Entry Point)' , () => {
         it('should fix brackets using RLM for Arabic', () => {
             expect(fixRTL('مرحبا (123)', { lang: 'arabic' })).toBe(`مرحبا (${BIDI.RLM}١٢٣${BIDI.RLM})`);
         });
+    });
 
-        it('should keep standard Latin digits when lang is "hebrew"', () => {
-            // Hebrew should not convert digits to Persian or Arabic
-            expect(fixRTL('שלום 123', { lang: 'hebrew' })).toBe('שלום 123');
+    describe("fixRTL with Hebrew", () => {
+        it("should NOT convert punctuation when lang is hebrew", () => {
+            expect(fixRTL("שלום, מה שלומך?", { lang: "hebrew" })).toBe("שלום, מה שלומך?");
+        });
+
+        it("should NOT convert digits when lang is hebrew", () => {
+            expect(fixRTL("שלום 123", { lang: "hebrew" })).toBe("שלום 123");
+        });
+
+        it("should still move ellipsis for Hebrew", () => {
+            expect(fixRTL("שלום...", { lang: "hebrew" })).toBe("...שלום");
+        });
+
+        it("should still fix brackets for Hebrew", () => {
+            const result = fixRTL("שלום (עולם)", { lang: "hebrew" });
+            expect(result).toContain("\u200E");
         });
     });
 
