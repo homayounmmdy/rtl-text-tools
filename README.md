@@ -84,7 +84,6 @@ import {
   convertPunctuation,
   fixBracket,
   moveEllipsis,
-  normalizeDirection,
   wrapRTL,
   wrapLTR,
   getRTLStyles,
@@ -114,11 +113,6 @@ fixBracket('مرحبا (بالعالم)', 'arabic') // Fixes brackets specifical
 // Ellipsis (supports both ... and the Unicode … character)
 moveEllipsis('مرحبا...')  // '...مرحبا'
 moveEllipsis('مرحبا…')   // '…مرحبا'
-
-// Direction normalization (mixed RTL/LTR text)
-const mixedText = "من در پارکی راه می رفتم و یک تابلو دیدم که روش نوشته بود Do not Park here";
-console.log(normalizeDirection(mixedText));
-// Text will render properly with RTL base direction
 ```
 
 ### React
@@ -179,19 +173,6 @@ Returns `true` if the text contains RTL characters.
 ### `hasHebrew(text: string): boolean`
 
 Returns `true` if the text specifically contains Hebrew characters.
-
-### `normalizeDirection(text: string): string`
-
-Wraps text with RTL embedding controls for proper readability of mixed RTL/LTR content.
-
-**Example:**
-```typescript
-// Without normalization - unreadable
-const mixed = "من در پارکی راه می رفتم Do not Park here";
-
-// With normalization - properly readable
-console.log(normalizeDirection(mixed));
-```
 
 ### `toArabicDigits(text: string): string`
 
