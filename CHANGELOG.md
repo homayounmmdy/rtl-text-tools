@@ -3,6 +3,7 @@
 All notable changes, releases, and updates to the `rtl-text-tools` project will be documented in this file.
 
 ## [v1.1.0] (Current)
+
 - 🏗️ **Major Refactor** — Complete codebase refactoring and structural improvements (no breaking API changes)
 - 🧪 **Full Test Coverage** — Added comprehensive tests for all code in `src`
 - ✨ Added `hasHebrew` — Dedicated function to detect Hebrew characters
@@ -11,6 +12,7 @@ All notable changes, releases, and updates to the `rtl-text-tools` project will 
 - 🖥️ **Enhanced Compatibility** — Further optimized code for maximum compatibility with old browsers (IE11+)
 
 ## [v1.0.0]
+
 - ✨ Added `wrapRTL` / `wrapLTR` — Unicode bidi markers for plain-text contexts
 - ✨ Added `getRTLStyles` / `getLTRStyles` — CSS style objects for React and vanilla JS
 - ✨ Added `setDirAttribute` — DOM `dir`/`lang` helper; uses structural typing, no DOM lib required
@@ -21,12 +23,19 @@ All notable changes, releases, and updates to the `rtl-text-tools` project will 
 - 🐛 Fixed `convertPunctuation` only replacing the **first** occurrence (missing `/g` flag)
 - 🖥️ Full IE11 compatibility — ES5 output, no `replaceAll`, no `u` regex flag
 
-## [v0.2.0]
-- ✨ Added punctuation conversion (LTR → RTL)
-- ✨ Added digit conversion (Latin → Persian/Arabic)
-- ♻️ Refactored internal naming conventions
+## [v0.2.0] 
 
+- ✨ Added `fixRTL()` — All-in-one function for punctuation, ellipsis, and digit conversion with language selection
+- ✨ Added `convertPunctuation()` — Converts LTR punctuation (`,`, `?`, `;`) to RTL equivalents (`،`, `؟`, `؛`)
+- ✨ Added `toArabicDigits()` — Converts Latin numbers to Arabic-Indic numerals (٠-٩)
+- ✨ Added `toPersianDigits()` — Converts Latin numbers to Persian numerals (۰-۹)
+- ✨ Added `moveEllipsis()` — Properly positions ellipsis characters in RTL text
+- ♻️ Improved RTL detection regex for better accuracy across Arabic, Hebrew, and presentation forms
+- ♻️ All functions now handle `null` and empty strings gracefully
+- ⚠️ `containsRTL()` renamed to `hasRTL()`
+- ⚠️ `fixRTLDots()` renamed to `moveEllipsis()`
 ## [v0.1.0]
+
 - 🎉 Initial release
 - ✅ RTL detection
 - ✅ Ellipsis fixing
