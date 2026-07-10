@@ -9,7 +9,7 @@ import {
     fixBracketsArabic,
     normalizeArabicAlef,
     normalizeArabicYeh,
-    toArabicDigits
+    toArabicDigits, toQuranicBrackets
 } from "./arabic";
 import {
     convertPunctuation,
@@ -91,8 +91,7 @@ export function fixRTL(
     var doArabicAlef = opts.normalizeArabicAlef !== undefined ? opts.normalizeArabicAlef : false;
     var doArabicYeh = opts.normalizeArabicYeh !== undefined ? opts.normalizeArabicYeh : false;
     var doHonorifics = opts.expandHonorifics !== undefined ? opts.expandHonorifics : false;
-
-
+    var doQuranic = opts.toQuranicBrackets !== undefined ? opts.toQuranicBrackets : false;
 
     // Persian specific flags
     var doPersianChars = opts.normalizePersianChars !== undefined ? opts.normalizePersianChars : true;
@@ -132,6 +131,7 @@ export function fixRTL(
         if (doArabicAlef) result = normalizeArabicAlef(result);
         if (doArabicYeh) result = normalizeArabicYeh(result);
         if (doHonorifics) result = expandArabicHonorifics(result);
+        if (doQuranic) result = toQuranicBrackets(result);
     }
 
     // ─── Persian Specific Fixes ────────────────────────────────────────────────
@@ -162,7 +162,7 @@ export function fixRTL(
 
 // ─── Re-exports ──────────────────────────────────────────────────────────────
 
-export {fixBracketsArabic, toArabicDigits, normalizeArabicAlef , normalizeArabicYeh, expandArabicHonorifics} from "./arabic";
+export {fixBracketsArabic, toArabicDigits, normalizeArabicAlef , normalizeArabicYeh, expandArabicHonorifics , toQuranicBrackets} from "./arabic";
 export {getLTRStyles, getRTLStyles, setDirAttribute} from "./css";
 export {
     BIDI,

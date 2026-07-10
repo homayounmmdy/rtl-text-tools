@@ -90,6 +90,7 @@ interface ArabicFixRTLOptions {
     normalizeArabicAlef?: boolean;
     normalizeArabicYeh?: boolean;
     expandHonorifics?: boolean;
+    toQuranicBrackets?: boolean;
 }
 
 export type FixRTLOptions =

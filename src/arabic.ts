@@ -92,3 +92,16 @@ export function expandArabicHonorifics(text: string): string {
       .replace(/\uFDFD/g, '\u0628\u0633\u0645 \u0627\u0644\u0644\u0647 \u0627\u0644\u0631\u062D\u0645\u0646 \u0627\u0644\u0631\u062D\u064A\u0645') // ﷽
       .replace(/\uFDF4/g, '\u0645\u062D\u0645\u062F'); // ﷴ
 }
+
+/**
+ * Converts standard parentheses () to ornate Quranic brackets ﴿ ﴾.
+ *
+ * Highly requested for Quranic apps and Islamic texts.
+ * Note: In RTL, the visual left bracket is ﴾ (U+FD3E) and visual right is ﴿ (U+FD3F).
+ */
+export function toQuranicBrackets(text: string): string {
+  if (!text) return text;
+  return text
+      .replace(/\(/g, '\uFD3F') // ( -> ﴿
+      .replace(/\)/g, '\uFD3E'); // ) -> ﴾
+}
