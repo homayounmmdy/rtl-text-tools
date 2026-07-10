@@ -95,6 +95,7 @@ interface ArabicFixRTLOptions {
 
 interface UrduFixRTLOptions {
     normalizeTehMarbuta?: boolean;
+    expandHonorifics?: boolean;
 }
 
 export type FixRTLOptions =

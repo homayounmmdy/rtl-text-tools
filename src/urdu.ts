@@ -34,3 +34,20 @@ export function normalizeUrduTehMarbuta(text: string): string {
     if (!text) return text;
     return text.replace(/\u0629/g, '\u06C1'); // ة -> ہ (Urdu Heh is U+06C1)
 }
+
+/**
+ * Expands Urdu-specific Islamic honorifics.
+ *
+ * Urdu has unique honorific phrases that are often written as ligatures
+ * or abbreviations. This expands them to full text for better rendering
+ * and searchability.
+ */
+export function expandUrduHonorifics(text: string): string {
+    if (!text) return text;
+
+    // Note: Urdu uses the same PBUH ligature as Arabic (ﷺ)
+    // But has unique phrases like "رحمۃ اللہ علیہ"
+    return text
+        .replace(/\uFDFA/g, '\u0635\u0644\u0649 \u0627\u0644\u0644\u0647 \u0639\u0644\u064A\u0647 \u0648\u0633\u0644\u0645') // ﷺ -> صلى الله عليه وسلم
+        .replace(/\uFDFD/g, '\u0628\u0633\u0645 \u0627\u0644\u0644\u0647 \u0627\u0644\u0631\u062D\u0645\u0646 \u0627\u0644\u0631\u062D\u064A\u0645'); // ﷽ -> بسم الله الرحمن الرحيم
+}

@@ -27,7 +27,7 @@ import {
 } from "./persian";
 import {fixHebrewFinalForms, normalizeHebrewQuotes, normalizeMaqaf} from "./hebrew";
 import {FixRTLOptions, InternalFixRTLOptions} from "./types/FixRTLOptions";
-import {normalizeUrduTehMarbuta} from "./urdu";
+import {expandUrduHonorifics, normalizeUrduTehMarbuta} from "./urdu";
 
 // ─── Main API ────────────────────────────────────────────────────────────────
 
@@ -102,6 +102,7 @@ export function fixRTL(
 
     // Urdu specific flags
     var doUrduTehMarbuta = opts.normalizeTehMarbuta !== undefined ? opts.normalizeTehMarbuta : true;
+    var doUrduHonorifics = opts.expandHonorifics !== undefined ? opts.expandHonorifics : false;
 
 
     // Hebrew specific flags
@@ -156,6 +157,7 @@ export function fixRTL(
         if (doPunctuation) result = convertPunctuation(result);
 
         if (doUrduTehMarbuta) result = normalizeUrduTehMarbuta(result);
+        if (doUrduHonorifics) result = expandUrduHonorifics(result);
     }
 
     // ─── Hebrew Specific Fixes ─────────────────────────────────────────────────
@@ -197,7 +199,7 @@ export {
     wrapRTL,
 } from "./general";
 export {hasHebrew, fixHebrewFinalForms, normalizeMaqaf, normalizeHebrewQuotes} from "./hebrew";
-export {hasUrdu,normalizeUrduTehMarbuta} from "./urdu";
+export {hasUrdu,normalizeUrduTehMarbuta,expandUrduHonorifics} from "./urdu";
 export {
     toPersianDigits, normalizePersianChars, toPersianDecimal, normalizeTehMarbuta, removePersianDiacritics
 } from "./persian";
