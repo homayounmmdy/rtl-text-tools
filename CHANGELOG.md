@@ -2,7 +2,21 @@
 
 All notable changes, releases, and updates to the `rtl-text-tools` project will be documented in this file.
 
-## [v1.1.0] (Current)
+## [v1.2.0] (Current)
+
+- ✨ **Urdu Support** — Added Urdu to the list of supported languages with dedicated normalizers (`normalizeUrduTehMarbuta`, `expandUrduHonorifics`, `removeUrduDiacritics`)
+- ✨ **Hebrew Enhancements** — Added `normalizeMaqaf`, `fixHebrewFinalForms`, and `normalizeHebrewQuotes`. Made Hebrew character detection stricter for better accuracy
+- ✨ **Persian Enhancements** — Added `normalizePersianChars`, `toPersianDecimal`, `normalizeTehMarbuta`, and `removePersianDiacritics`
+- ✨ **Arabic Enhancements** — Added `normalizeArabicAlef`, `normalizeArabicYeh`, `expandArabicHonorifics`, and `toQuranicBrackets`
+- ✨ **Minor Languages Detection** — Added detection functions for Kurdish (`hasKurdish`), Pashto (`hasPashto`), Sindhi (`hasSindhi`), Uyghur (`hasUyghur`), and Punjabi (`hasPunjabi`)
+- 🚀 **Developer Experience (DX)** — Improved TypeScript intellisense to provide strict types and options based on the selected language
+- 🧠 **Smart Punctuation** — `convertPunctuation` now automatically skips Hebrew text to preserve Western punctuation
+- 🧠 **Smart Decimals** — `toPersianDecimal` now safely ignores IP addresses and version numbers (e.g., `192.168.1.1`, `1.2.0`) to prevent unwanted conversions
+- 🐛 **Decimal Conversion Bug** — Fixed a bug where IP addresses and version numbers were incorrectly converted to Persian decimals
+- 🧪 **Test Coverage** — Maintained strict 99% test coverage for all newly added features and language functions
+- 📖 **Documentation & Repo** — Added downloads badge, `CONTRIBUTING.md`, `CODE_OF_CONDUCT.md`, `SECURITY.md`, and this `CHANGELOG.md`. Added `dependabot.yml` for automated dependency updates and removed `dist/` from version control to keep the repository clean
+
+## [v1.1.0]
 
 - 🏗️ **Major Refactor** — Complete codebase refactoring and structural improvements (no breaking API changes)
 - 🧪 **Full Test Coverage** — Added comprehensive tests for all code in `src`

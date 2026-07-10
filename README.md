@@ -3,6 +3,7 @@
 [![npm version](https://badge.fury.io/js/rtl-text-tools.svg)](https://www.npmjs.com/package/rtl-text-tools)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![npm downloads](https://img.shields.io/npm/dt/rtl-text-tools.svg)](https://www.npmjs.com/package/rtl-text-tools)
+[![Coverage](https://img.shields.io/badge/coverage-99%25-brightgreen.svg)](./test)
 
 A complete text processing toolkit for RTL (Right-to-Left) languages. Fix ellipsis, punctuation, digit conversion, brackets, bidi wrapping, and CSS helpers for Arabic, Hebrew, Persian, Urdu, and other RTL scripts.
 
@@ -11,17 +12,17 @@ Works back to **IE11** with zero runtime dependencies. Fully tested and optimize
 ## 📜 Features
 
 - ✅ **RTL Detection** — Identify if text contains RTL characters (Arabic, Persian, Syriac, Thaana, N'Ko, and more)
-- ✅ **Hebrew Detection** — Specifically detect Hebrew characters with `hasHebrew`
+- ✅ **Strict Language Detection** — Specifically detect Hebrew (with stricter rules), Kurdish, Pashto, Sindhi, Uyghur, and Punjabi
 - ✅ **Direction Normalization** — Fix mixed RTL/LTR text readability issues
-- ✅ **Digit Conversion** — Convert Latin digits to Persian (`۰–۹`) or Arabic-Indic (`٠–٩`) numerals
-- ✅ **Punctuation Conversion** — Convert `, ; ?` to their RTL equivalents `، ؛ ؟`  all occurrences
-- ✅ **Bracket Fixing** — Convert and fix brackets for Arabic and general RTL contexts
+- ✅ **Digit & Decimal Conversion** — Convert Latin digits to Persian (`۰–۹`), Arabic-Indic (`٠–٩`), or smart Persian decimals (safely ignores IPs and version numbers)
+- ✅ **Punctuation Conversion** — Convert `, ; ?` to their RTL equivalents `، ؛ ؟` (Skips Hebrew to preserve Western punctuation)
+- ✅ **Bracket Fixing** — Convert and fix brackets for Arabic, including Quranic brackets `﴿ ﴾`
 - ✅ **Ellipsis Fixing** — Move trailing `...` or `…` to the start of RTL text
 - ✅ **Bidi Markers** — Wrap text with Unicode RLE/PDF control characters for plain-text contexts
-- ✅ **CSS Helpers** — Ready-to-use `{ direction, unicodeBidi }` style objects
-- ✅ **DOM Helper** — Set `dir` and `lang` attributes on elements
-- ✅ **Text Normalization** — Comprehensive RTL text processing
-- ✅ **Fully Tested** — Comprehensive test coverage for all source code
+- ✅ **CSS & DOM Helpers** — Ready-to-use style objects and attribute setters
+- ✅ **Advanced Text Normalization** — Language-specific normalizers for Persian, Arabic, Hebrew, and Urdu (diacritics, honorifics, final forms, etc.)
+- ✅ **Enhanced DX** — Strict TypeScript intellisense based on the selected language
+- ✅ **99% Test Coverage** — Comprehensive test coverage maintained for all new features
 
 ## 🚀 Installation
 
@@ -64,10 +65,11 @@ fixRTL('Hello, world!')
 ```typescript
 import { fixRTL } from 'rtl-text-tools';
 
+// TypeScript now provides strict intellisense for options based on the selected language!
 fixRTL(text, {
-  lang: 'persian',            // 'persian' (default) | 'arabic'
+  lang: 'persian',            // 'persian' | 'arabic' | 'hebrew' | 'urdu'
   convertDigits: true,        // convert Latin 0–9 to locale digits
-  convertPunctuation: true,   // convert , ; ? → ، ؛ ؟
+  convertPunctuation: true,   // convert , ; ? → ، ؛ ؟ (automatically skips Hebrew)
   fixEllipsis: true,          // move trailing ... to the start
   addBidiMarkers: false,      // wrap with Unicode RLE/PDF (for plain-text)
 });
@@ -79,8 +81,10 @@ fixRTL(text, {
 import {
   hasRTL,
   hasHebrew,
+  hasKurdish,
   toArabicDigits,
   toPersianDigits,
+  toPersianDecimal,
   convertPunctuation,
   fixBracket,
   moveEllipsis,
@@ -97,11 +101,12 @@ hasRTL('Hello')   // false
 hasRTL('שלום')    // true
 
 hasHebrew('שלום') // true
-hasHebrew('مرحبا') // false
+hasKurdish('کوردی') // true
 
 // Digit conversion
 toArabicDigits('Price 123')   // 'Price ١٢٣'
 toPersianDigits('Price 123')  // 'Price ۱۲۳'
+toPersianDecimal('Version 1.2.0') // 'Version 1.2.0' (Safely ignores versions/IPs)
 
 // Punctuation
 convertPunctuation('مرحبا, كيف حالك?')  // 'مرحبا، كيف حالك؟'
@@ -170,76 +175,16 @@ Returns `true` if the text contains RTL characters.
 - RTL Presentation Forms: `\uFB1D-\uFDFF`, `\uFE70-\uFEFC`
 - Syriac, Thaana, N'Ko, Samaritan, Mandaic
 
-### `hasHebrew(text: string): boolean`
-
-Returns `true` if the text specifically contains Hebrew characters.
-
-### `toArabicDigits(text: string): string`
-
-Converts Latin numbers (0-9) to Arabic-Indic numerals (`٠-٩`). Used for Arabic, Egyptian, and most Middle Eastern content.
-
-**Example:**
-```typescript
-toArabicDigits("Price 123") // "Price ١٢٣"
-```
-
-### `toPersianDigits(text: string): string`
-
-Converts Latin numbers (0-9) to Extended Persian numerals (`۰-۹`). Used for Persian (Farsi), Urdu, Dari, and Pashto content.
-
-**Example:**
-```typescript
-toPersianDigits("Price 123") // "Price ۱۲۳"
-```
-
 ### `convertPunctuation(text: string): string`
 
 Converts LTR punctuation marks to their RTL equivalents when RTL text is present. Replaces **all occurrences**.
+*Note: As of v1.2.0, this function automatically skips Hebrew text to preserve Western punctuation.*
 
 | LTR | RTL | Name |
 |-----|-----|------|
 | `,` | `،` | Arabic Comma |
 | `?` | `؟` | Arabic Question Mark |
 | `;` | `؛` | Arabic Semicolon |
-
-Returns the original string unchanged if no RTL characters are present.
-
-### `fixBracket(text: string, type?: 'general' | 'arabic'): string`
-
-Fixes and converts brackets in RTL text.
-- `'general'` (default): Ensures brackets are correctly ordered and rendered for general RTL text.
-- `'arabic'`: Converts brackets to Arabic-specific equivalents (e.g., `﴿ ﴾`, `« »`) where appropriate.
-
-**Example:**
-```typescript
-fixBracket('Hello (world)') // General RTL bracket fixing
-fixBracket('مرحبا (بالعالم)', 'arabic') // Arabic-specific bracket conversion
-```
-
-### `moveEllipsis(text: string): string`
-
-Moves a trailing `...` or `…` (U+2026) to the beginning of RTL text.
-Returns the original string unchanged if no RTL characters are present, or if the ellipsis is not at the end.
-
-### `wrapRTL(text: string): string`
-
-Wraps text with `RLM + RLE … PDF` Unicode bidi control characters to force RTL rendering in plain-text contexts (email clients, textareas, terminals).
-
-### `wrapLTR(text: string): string`
-
-Wraps text with `LRM + LRE … PDF` Unicode bidi control characters. Useful for embedding URLs, numbers, or code inside RTL text.
-
-### `getRTLStyles(): { direction: string; unicodeBidi: string }`
-
-Returns `{ direction: 'rtl', unicodeBidi: 'embed' }` ready for React inline styles or `Object.assign(el.style, ...)`.
-
-### `getLTRStyles(): { direction: string; unicodeBidi: string }`
-
-Returns `{ direction: 'ltr', unicodeBidi: 'embed' }`.
-
-### `setDirAttribute(element: AttributeSettable, lang: string): void`
-
-Sets `dir="rtl"` and the given `lang` attribute on any element with `setAttribute`. Accepts `HTMLElement`, `SVGElement`, or any structurally compatible object  no DOM lib required in your tsconfig.
 
 ### `fixRTL(text: string, options?: FixRTLOptions | string): string`
 
@@ -249,9 +194,9 @@ Sets `dir="rtl"` and the given `lang` attribute on any element with `setAttribut
 
 ```typescript
 interface FixRTLOptions {
-  lang?: 'persian' | 'arabic';   // default: 'persian'
+  lang?: 'persian' | 'arabic' | 'hebrew' | 'urdu'; // Enhanced TS intellisense based on language
   convertDigits?: boolean;        // default: true
-  convertPunctuation?: boolean;   // default: true
+  convertPunctuation?: boolean;   // default: true (automatically skips Hebrew)
   fixEllipsis?: boolean;          // default: true
   addBidiMarkers?: boolean;       // default: false
 }
@@ -259,9 +204,100 @@ interface FixRTLOptions {
 
 Also accepts a plain language string for shorthand: `fixRTL(text, 'arabic')`.
 
-**Returns:**
-- Processed string with all fixes applied
-- Original string unchanged if no RTL characters are present
+---
+
+### 🇮🇷 Persian Specific Functions
+
+#### `normalizePersianChars(text: string): string`
+Normalizes Persian-specific characters.
+
+#### `toPersianDecimal(text: string): string`
+Converts Latin numbers to Extended Persian decimals. 
+*Note: As of v1.2.0, this function safely ignores IP addresses and version numbers (e.g., `192.168.1.1` or `1.2.0` remain unchanged).*
+
+#### `normalizeTehMarbuta(text: string): string`
+Normalizes TehMarbuta characters in Persian text.
+
+#### `removePersianDiacritics(text: string): string`
+Removes diacritics from Persian text.
+
+### 🇸🇦 Arabic Specific Functions
+
+#### `normalizeArabicAlef(text: string): string`
+Normalizes different forms of Alef in Arabic.
+
+#### `normalizeArabicYeh(text: string): string`
+Normalizes different forms of Yeh in Arabic.
+
+#### `expandArabicHonorifics(text: string): string`
+Expands Arabic honorifics (e.g., PBUH, SWA).
+
+#### `toQuranicBrackets(text: string): string`
+Converts standard brackets to Quranic brackets `﴿ ﴾`.
+
+### 🇮🇱 Hebrew Specific Functions
+
+#### `normalizeMaqaf(text: string): string`
+Normalizes the Hebrew Maqaf (hyphen) character.
+
+#### `fixHebrewFinalForms(text: string): string`
+Fixes and normalizes Hebrew final letter forms.
+
+#### `normalizeHebrewQuotes(text: string): string`
+Normalizes Hebrew quotation marks.
+
+### 🇵🇰 Urdu Specific Functions
+
+#### `normalizeUrduTehMarbuta(text: string): string`
+Normalizes TehMarbuta characters in Urdu.
+
+#### `expandUrduHonorifics(text: string): string`
+Expands Urdu honorifics.
+
+#### `removeUrduDiacritics(text: string): string`
+Removes diacritics from Urdu text.
+
+### 🌍 Minor Languages Detection
+
+#### `hasKurdish(text: string): boolean`
+Returns `true` if the text contains Kurdish characters.
+
+#### `hasPashto(text: string): boolean`
+Returns `true` if the text contains Pashto characters.
+
+#### `hasSindhi(text: string): boolean`
+Returns `true` if the text contains Sindhi characters.
+
+#### `hasUyghur(text: string): boolean`
+Returns `true` if the text contains Uyghur characters.
+
+#### `hasPunjabi(text: string): boolean`
+Returns `true` if the text contains Punjabi characters.
+
+---
+
+### Other Helpers
+
+#### `toArabicDigits(text: string): string`
+Converts Latin numbers (0-9) to Arabic-Indic numerals (`٠-٩`).
+
+#### `toPersianDigits(text: string): string`
+Converts Latin numbers (0-9) to Extended Persian numerals (`۰-۹`).
+
+#### `fixBracket(text: string, type?: 'general' | 'arabic'): string`
+Fixes and converts brackets in RTL text.
+
+#### `moveEllipsis(text: string): string`
+Moves a trailing `...` or `…` to the beginning of RTL text.
+
+#### `wrapRTL(text: string): string` & `wrapLTR(text: string): string`
+Wraps text with Unicode bidi control characters to force RTL/LTR rendering in plain-text contexts.
+
+#### `getRTLStyles()` & `getLTRStyles()`
+Returns `{ direction: 'rtl'/'ltr', unicodeBidi: 'embed' }` ready for React inline styles.
+
+#### `setDirAttribute(element: AttributeSettable, lang: string): void`
+Sets `dir="rtl"` and the given `lang` attribute on any element.
 
 ## 🌍 Supported RTL Languages
 
@@ -272,6 +308,8 @@ Also accepts a plain language string for shorthand: `fixRTL(text, 'arabic')`.
 - Pashto (پښتو)
 - Kurdish (سۆرانی)
 - Sindhi (سنڌي)
+- Uyghur (ئۇيغۇرچە)
+- Punjabi (ਪੰਜਾਬੀ)
 - Syriac
 - Thaana
 - N'Ko
@@ -304,6 +342,10 @@ Please check out the [Contributing Guide](./CONTRIBUTING.md) for details.
 ## 📜 Code of Conduct
 
 Please note that this project is released with a [Contributor Code of Conduct](./CODE_OF_CONDUCT.md). By participating in this project you agree to abide by its terms.
+
+## 🔒 Security
+
+For information on how to report security vulnerabilities, please see our [Security Policy](./SECURITY.md).
 
 ## 🐛 Issues
 
