@@ -89,6 +89,7 @@ interface HebrewFixRTLOptions {
 interface ArabicFixRTLOptions {
     normalizeArabicAlef?: boolean;
     normalizeArabicYeh?: boolean;
+    expandHonorifics?: boolean;
 }
 
 export type FixRTLOptions =

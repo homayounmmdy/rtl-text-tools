@@ -70,3 +70,25 @@ export function normalizeArabicYeh(text: string): string {
   if (!text) return text;
   return text.replace(/\u0649/g, '\u064A'); // ى -> ي
 }
+
+/**
+ * Expands Unicode Islamic honorific ligatures into their full text forms.
+ *
+ * Many fonts do not render these ligatures correctly (showing empty boxes).
+ * This function replaces them with the actual, searchable Arabic text.
+ *
+ * Examples:
+ * - ﷺ (U+FDFA) -> صلى الله عليه وسلم
+ * - ﷻ (U+FDFB) -> جل جلاله
+ * - ﷽ (U+FDFD) -> بسم الله الرحمن الرحيم
+ * - ﷴ (U+FDF4) -> محمد
+ */
+export function expandArabicHonorifics(text: string): string {
+  if (!text) return text;
+
+  return text
+      .replace(/\uFDFA/g, '\u0635\u0644\u0649 \u0627\u0644\u0644\u0647 \u0639\u0644\u064A\u0647 \u0648\u0633\u0644\u0645') // ﷺ
+      .replace(/\uFDFB/g, '\u062C\u0644 \u062C\u0644\u0627\u0644\u0647') // ﷻ
+      .replace(/\uFDFD/g, '\u0628\u0633\u0645 \u0627\u0644\u0644\u0647 \u0627\u0644\u0631\u062D\u0645\u0646 \u0627\u0644\u0631\u062D\u064A\u0645') // ﷽
+      .replace(/\uFDF4/g, '\u0645\u062D\u0645\u062F'); // ﷴ
+}
