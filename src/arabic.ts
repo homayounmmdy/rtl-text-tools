@@ -41,3 +41,20 @@ export function toArabicDigits(text: string): string {
     return ARABIC_DIGITS[d];
   });
 }
+
+// ─── Arabic Deep Normalization ───────────────────────────────────────────────
+
+/**
+ * Normalizes all forms of Alef to the plain Alef (ا).
+ *
+ * Essential for search engines and text comparison, where
+ * Alef variants (آ, أ, إ, ٱ) are typically treated as identical.
+ */
+export function normalizeArabicAlef(text: string): string {
+  if (!text) return text;
+  return text
+      .replace(/\u0622/g, '\u0627') // آ -> ا
+      .replace(/\u0623/g, '\u0627') // أ -> ا
+      .replace(/\u0625/g, '\u0627') // إ -> ا
+      .replace(/\u0671/g, '\u0627'); // ٱ -> ا
+}

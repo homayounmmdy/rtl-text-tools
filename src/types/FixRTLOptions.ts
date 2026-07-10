@@ -86,11 +86,16 @@ interface HebrewFixRTLOptions {
     normalizeHebrewTypography?: boolean;
 }
 
+interface ArabicFixRTLOptions {
+    normalizeArabicAlef?: boolean;
+}
+
 export type FixRTLOptions =
+    | (BaseFixRTLOptions & { lang?: 'arabic' } & ArabicFixRTLOptions)
     | (BaseFixRTLOptions & { lang?: 'persian' } & PersianFixRTLOptions)
     | (BaseFixRTLOptions & { lang: 'hebrew' } & HebrewFixRTLOptions);
 
-export interface InternalFixRTLOptions extends BaseFixRTLOptions, PersianFixRTLOptions, HebrewFixRTLOptions {
+export interface InternalFixRTLOptions extends BaseFixRTLOptions,ArabicFixRTLOptions, PersianFixRTLOptions, HebrewFixRTLOptions {
     /**
      * Target language. Controls which digit set is used.
      * - `"arabic"`  → Arabic-Indic digits ٠١٢٣٤٥٦٧٨٩  (default for Arabic locales)
