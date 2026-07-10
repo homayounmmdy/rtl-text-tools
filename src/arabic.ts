@@ -58,3 +58,15 @@ export function normalizeArabicAlef(text: string): string {
       .replace(/\u0625/g, '\u0627') // إ -> ا
       .replace(/\u0671/g, '\u0627'); // ٱ -> ا
 }
+
+/**
+ * Normalizes Alef Maqsura (ى) to standard Yeh (ي).
+ *
+ * In many Arabic dialects (like Egyptian) and common typing habits,
+ * Alef Maqsura is used interchangeably with Yeh at the end of words.
+ * Normalizing them ensures consistent search results.
+ */
+export function normalizeArabicYeh(text: string): string {
+  if (!text) return text;
+  return text.replace(/\u0649/g, '\u064A'); // ى -> ي
+}

@@ -4,7 +4,7 @@
  * Supports: IE11+, Edge, Firefox, Chrome, Safari, all modern browsers.
  * Handles Arabic, Hebrew, Persian, Urdu, Dari, Pashto, and other RTL scripts.
  */
-import {fixBracketsArabic, normalizeArabicAlef, toArabicDigits} from "./arabic";
+import {fixBracketsArabic, normalizeArabicAlef, normalizeArabicYeh, toArabicDigits} from "./arabic";
 import {
     convertPunctuation,
     fixBrackets,
@@ -83,6 +83,7 @@ export function fixRTL(
 
     // Arabic specific flags
     var doArabicAlef = opts.normalizeArabicAlef !== undefined ? opts.normalizeArabicAlef : false;
+    var doArabicYeh = opts.normalizeArabicYeh !== undefined ? opts.normalizeArabicYeh : false;
 
 
     // Persian specific flags
@@ -121,6 +122,7 @@ export function fixRTL(
 
     if (lang === "arabic") {
         if (doArabicAlef) result = normalizeArabicAlef(result);
+        if (doArabicYeh) result = normalizeArabicYeh(result);
     }
 
     // ─── Persian Specific Fixes ────────────────────────────────────────────────
@@ -151,7 +153,7 @@ export function fixRTL(
 
 // ─── Re-exports ──────────────────────────────────────────────────────────────
 
-export {fixBracketsArabic, toArabicDigits, normalizeArabicAlef} from "./arabic";
+export {fixBracketsArabic, toArabicDigits, normalizeArabicAlef , normalizeArabicYeh} from "./arabic";
 export {getLTRStyles, getRTLStyles, setDirAttribute} from "./css";
 export {
     BIDI,
