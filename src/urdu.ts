@@ -36,6 +36,20 @@ export function normalizeUrduTehMarbuta(text: string): string {
 }
 
 /**
+ * Removes Urdu-specific diacritics, including the Ghunna mark (٘).
+ *
+ * The Ghunna mark (U+06D8) is unique to Urdu and indicates a nasal sound.
+ * This function removes it along with standard Arabic diacritics.
+ *
+ * WARNING: Do not use this for Quranic texts or children's books.
+ */
+export function removeUrduDiacritics(text: string): string {
+    if (!text) return text;
+    // Remove standard Arabic diacritics + Urdu Ghunna mark
+    return text.replace(/[\u064B-\u065F\u06D8]/g, '');
+}
+
+/**
  * Expands Urdu-specific Islamic honorifics.
  *
  * Urdu has unique honorific phrases that are often written as ligatures

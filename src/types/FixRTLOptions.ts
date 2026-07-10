@@ -94,6 +94,7 @@ interface ArabicFixRTLOptions {
 }
 
 interface UrduFixRTLOptions {
+    removeDiacritics?: boolean;
     normalizeTehMarbuta?: boolean;
     expandHonorifics?: boolean;
 }
