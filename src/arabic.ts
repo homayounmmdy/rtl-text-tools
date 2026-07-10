@@ -1,7 +1,7 @@
 /**
- * Fixes reversed parentheses in Hebrew text.
- * Inserts an invisible LRM (Left-to-Right Mark) inside the brackets to force
- * the browser to treat them as LTR characters, preventing visual reversal.
+ * Fixes reversed parentheses in Arabic/RTL text.
+ * Inserts an invisible RLM (Right-to-Left Mark, U+200F) inside the brackets to force
+ * the browser to treat them as RTL characters, preventing visual reversal when mixed with LTR.
  */
 
 export function fixBracketsArabic(text: string): string {
