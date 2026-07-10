@@ -13,11 +13,12 @@
  * @returns Text with corrected Hebrew final forms
  */
 export function fixHebrewFinalForms(text: string): string {
-  if (!text || !hasHebrew(text)) return text;
+  if (!text) return text;
 
   const regular = '\u05DB\u05DE\u05E0\u05E4\u05E6'; // Kaf, Mem, Nun, Pe, Tsade
   const final = '\u05DA\u05DD\u05DF\u05E3\u05E5';   // Their final forms
 
+  const HEBREW_LETTER_REGEX = /[\u05D0-\u05EA\u05F0-\u05F2]/;
   let result = '';
   for (let i = 0; i < text.length; i++) {
     const char = text[i];
@@ -26,11 +27,10 @@ export function fixHebrewFinalForms(text: string): string {
 
     if (regIndex !== -1 || finalIndex !== -1) {
       // Look ahead to see if the next *actual letter* is Hebrew
-      // We skip diacritics (\u0590-\u05CF) because they don't break word continuity
       let nextIsHebrewLetter = false;
       for (let j = i + 1; j < text.length; j++) {
         const nextChar = text[j];
-        if (/[\u05D0-\u05EA\u05F0-\u05F2]/.test(nextChar)) {
+        if (HEBREW_LETTER_REGEX.test(nextChar)) {
           nextIsHebrewLetter = true;
           break;
         }
@@ -64,9 +64,8 @@ export function fixHebrewFinalForms(text: string): string {
  * @returns Text with Maqaf hyphens
  */
 export function normalizeMaqaf(text: string): string {
-  if (!text || !hasHebrew(text)) return text;
+  if (!text) return text;
 
-  // Replace hyphen with Maqaf (\u05BE) ONLY if strictly between two Hebrew letters
   return text.replace(/([\u05D0-\u05EA\u05F0-\u05F2])-([\u05D0-\u05EA\u05F0-\u05F2])/g, '$1\u05BE$2');
 }
 /**
@@ -79,7 +78,7 @@ export function normalizeMaqaf(text: string): string {
  * @returns Text with Geresh and Gershayim
  */
 export function normalizeHebrewQuotes(text: string): string {
-  if (!text || !hasHebrew(text)) return text;
+  if (!text) return text;
 
   // Single quote -> Geresh (\u05F3)
   text = text.replace(/([\u05D0-\u05EA\u05F0-\u05F2])'([\u05D0-\u05EA\u05F0-\u05F2])/g, '$1\u05F3$2');
