@@ -201,9 +201,11 @@ export {
     wrapRTL,
 } from "./general";
 export {hasHebrew, fixHebrewFinalForms, normalizeMaqaf, normalizeHebrewQuotes} from "./hebrew";
-export {hasUrdu,normalizeUrduTehMarbuta,expandUrduHonorifics,removeUrduDiacritics} from "./urdu";
+export {hasUrdu, normalizeUrduTehMarbuta, expandUrduHonorifics, removeUrduDiacritics} from "./urdu";
 export {
     toPersianDigits, normalizePersianChars, toPersianDecimal, normalizeTehMarbuta, removePersianDiacritics
 } from "./persian";
-
+export {
+    hasKurdish
+} from './minor-languages'
 export default fixRTL;
