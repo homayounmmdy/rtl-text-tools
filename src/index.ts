@@ -209,6 +209,7 @@ export {
     hasKurdish,
     hasPashto,
     hasSindhi,
-    hasUyghur
+    hasUyghur,
+    hasPunjabi
 } from './minor-languages'
 export default fixRTL;

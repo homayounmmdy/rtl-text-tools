@@ -38,3 +38,14 @@ export function hasUyghur(text: string): boolean {
     // Uyghur-specific letters
     return /[\u06D0\u06C7\u06C6\u06C8\u06CB\u06BE]/.test(text);
 }
+
+/**
+ * Detects Punjabi (Shahmukhi) text.
+ * Punjabi uses Urdu script, so detection is similar to Urdu.
+ */
+export function hasPunjabi(text: string): boolean {
+    if (!text) return false;
+    // Punjabi uses same letters as Urdu, but you could check for common words
+    // For simplicity, just check if it has Urdu letters
+    return /[\u06D2\u06BA\u06BE\u0679\u0688\u0691]/.test(text);
+}
