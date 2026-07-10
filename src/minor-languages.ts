@@ -28,3 +28,13 @@ export function hasSindhi(text: string): boolean {
     // Sindhi-specific letters
     return /[\u067A\u067F\u0680\u0684\u0683\u0687]/.test(text);
 }
+
+/**
+ * Detects Uyghur text.
+ * Uyghur uses Arabic script with unique letters like ې, ۇ, ۆ, ۈ, ۋ, ھ.
+ */
+export function hasUyghur(text: string): boolean {
+    if (!text) return false;
+    // Uyghur-specific letters
+    return /[\u06D0\u06C7\u06C6\u06C8\u06CB\u06BE]/.test(text);
+}
