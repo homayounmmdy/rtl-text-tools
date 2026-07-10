@@ -21,3 +21,16 @@ export function hasUrdu(text: string): boolean {
     if (!text) return false;
     return URDU_SPECIFIC_REGEX.test(text);
 }
+
+// ─── Normalization ──────────────────────────────────────────
+
+/**
+ * Normalizes Urdu Teh Marbuta (ة) to Heh (ہ).
+ *
+ * Like Persian, Urdu rarely uses Teh Marbuta. It's usually a typo
+ * or copy-paste from Arabic text.
+ */
+export function normalizeUrduTehMarbuta(text: string): string {
+    if (!text) return text;
+    return text.replace(/\u0629/g, '\u06C1'); // ة -> ہ (Urdu Heh is U+06C1)
+}

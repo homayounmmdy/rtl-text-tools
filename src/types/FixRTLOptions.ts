@@ -93,12 +93,17 @@ interface ArabicFixRTLOptions {
     toQuranicBrackets?: boolean;
 }
 
+interface UrduFixRTLOptions {
+    normalizeTehMarbuta?: boolean;
+}
+
 export type FixRTLOptions =
-    | (BaseFixRTLOptions & { lang?: 'arabic' } & ArabicFixRTLOptions)
+    | (BaseFixRTLOptions & { lang: 'arabic' } & ArabicFixRTLOptions)
     | (BaseFixRTLOptions & { lang?: 'persian' } & PersianFixRTLOptions)
+    | (BaseFixRTLOptions & { lang: 'urdu' } & UrduFixRTLOptions)
     | (BaseFixRTLOptions & { lang: 'hebrew' } & HebrewFixRTLOptions);
 
-export interface InternalFixRTLOptions extends BaseFixRTLOptions,ArabicFixRTLOptions, PersianFixRTLOptions, HebrewFixRTLOptions {
+export interface InternalFixRTLOptions extends BaseFixRTLOptions, ArabicFixRTLOptions, PersianFixRTLOptions, HebrewFixRTLOptions , UrduFixRTLOptions{
     /**
      * Target language. Controls which digit set is used.
      * - `"arabic"`  → Arabic-Indic digits ٠١٢٣٤٥٦٧٨٩  (default for Arabic locales)

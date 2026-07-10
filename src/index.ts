@@ -27,6 +27,7 @@ import {
 } from "./persian";
 import {fixHebrewFinalForms, normalizeHebrewQuotes, normalizeMaqaf} from "./hebrew";
 import {FixRTLOptions, InternalFixRTLOptions} from "./types/FixRTLOptions";
+import {normalizeUrduTehMarbuta} from "./urdu";
 
 // ─── Main API ────────────────────────────────────────────────────────────────
 
@@ -99,6 +100,10 @@ export function fixRTL(
     var doTehMarbuta = opts.normalizeTehMarbuta !== undefined ? opts.normalizeTehMarbuta : true;
     var doDiacritics = opts.removeDiacritics !== undefined ? opts.removeDiacritics : false;
 
+    // Urdu specific flags
+    var doUrduTehMarbuta = opts.normalizeTehMarbuta !== undefined ? opts.normalizeTehMarbuta : true;
+
+
     // Hebrew specific flags
     var doHebrewTypography = opts.normalizeHebrewTypography !== undefined ? opts.normalizeHebrewTypography : false;
 
@@ -149,6 +154,8 @@ export function fixRTL(
 
         // Urdu uses Arabic punctuation (، ؛ ؟)
         if (doPunctuation) result = convertPunctuation(result);
+
+        if (doUrduTehMarbuta) result = normalizeUrduTehMarbuta(result);
     }
 
     // ─── Hebrew Specific Fixes ─────────────────────────────────────────────────
@@ -190,7 +197,7 @@ export {
     wrapRTL,
 } from "./general";
 export {hasHebrew, fixHebrewFinalForms, normalizeMaqaf, normalizeHebrewQuotes} from "./hebrew";
-export {hasUrdu} from "./urdu";
+export {hasUrdu,normalizeUrduTehMarbuta} from "./urdu";
 export {
     toPersianDigits, normalizePersianChars, toPersianDecimal, normalizeTehMarbuta, removePersianDiacritics
 } from "./persian";
