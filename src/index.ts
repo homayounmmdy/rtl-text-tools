@@ -30,7 +30,7 @@ import {FixRTLOptions, InternalFixRTLOptions} from "./types/FixRTLOptions";
 
 // ─── Main API ────────────────────────────────────────────────────────────────
 
-export type Language = "arabic" | "persian" | "hebrew";
+export type Language = "arabic" | "persian" | "hebrew" | "urdu";
 
 /**
  * Applies all RTL text fixes at once — the main entry point.
@@ -142,6 +142,15 @@ export function fixRTL(
         if (doDiacritics) result = removePersianDiacritics(result);
     }
 
+    // ─── Urdu Specific Fixes ───────────────────────────────────────────────────
+    if (lang === "urdu") {
+        // Urdu uses Persian digits (۰-۹)
+        if (doDigits) result = toPersianDigits(result);
+
+        // Urdu uses Arabic punctuation (، ؛ ؟)
+        if (doPunctuation) result = convertPunctuation(result);
+    }
+
     // ─── Hebrew Specific Fixes ─────────────────────────────────────────────────
     if (lang === "hebrew") {
         result = fixHebrewFinalForms(result);
@@ -162,7 +171,14 @@ export function fixRTL(
 
 // ─── Re-exports ──────────────────────────────────────────────────────────────
 
-export {fixBracketsArabic, toArabicDigits, normalizeArabicAlef , normalizeArabicYeh, expandArabicHonorifics , toQuranicBrackets} from "./arabic";
+export {
+    fixBracketsArabic,
+    toArabicDigits,
+    normalizeArabicAlef,
+    normalizeArabicYeh,
+    expandArabicHonorifics,
+    toQuranicBrackets
+} from "./arabic";
 export {getLTRStyles, getRTLStyles, setDirAttribute} from "./css";
 export {
     BIDI,
@@ -174,6 +190,7 @@ export {
     wrapRTL,
 } from "./general";
 export {hasHebrew, fixHebrewFinalForms, normalizeMaqaf, normalizeHebrewQuotes} from "./hebrew";
+export {hasUrdu} from "./urdu";
 export {
     toPersianDigits, normalizePersianChars, toPersianDecimal, normalizeTehMarbuta, removePersianDiacritics
 } from "./persian";
