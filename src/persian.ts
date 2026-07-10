@@ -21,13 +21,25 @@ export function normalizePersianChars(text: string): string {
 /**
  * Converts standard Latin decimal dots to the Persian Momayyez (٫).
  *
- * ONLY replaces the dot if it is strictly between two digits (e.g., "12.5").
- * This prevents breaking URLs, file extensions, or IP addresses.
+ * ONLY replaces the dot if it is strictly a decimal number (e.g., "12.5").
+ * This prevents breaking URLs, file extensions, IP addresses, or version numbers.
  */
 export function toPersianDecimal(text: string): string {
   if (!text) return text;
 
-  return text.replace(/([0-9])\.([0-9])/g, '$1\u066B$2');
+  // Match sequences of digits and dots (e.g., "12.5", "192.168.1.1", "1.2.3")
+  return text.replace(/\d[\d.]*\d/g, (match) => {
+    // Count the number of dots in the matched sequence
+    const dotCount = (match.match(/\./g) || []).length;
+
+    // Only convert if it's a simple decimal number (exactly one dot)
+    if (dotCount === 1) {
+      return match.replace('.', '\u066B');
+    }
+
+    // Otherwise, return the original match untouched (IP addresses, versions, etc.)
+    return match;
+  });
 }
 
 // ─── Persian Deep Normalization ──────────────────────────────────────────────
