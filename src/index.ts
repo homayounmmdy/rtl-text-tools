@@ -206,6 +206,7 @@ export {
     toPersianDigits, normalizePersianChars, toPersianDecimal, normalizeTehMarbuta, removePersianDiacritics
 } from "./persian";
 export {
-    hasKurdish
+    hasKurdish,
+    hasPashto
 } from './minor-languages'
 export default fixRTL;
