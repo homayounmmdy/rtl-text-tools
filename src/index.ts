@@ -20,94 +20,11 @@ import {
     toPersianDigits
 } from "./persian";
 import {fixHebrewFinalForms, normalizeHebrewQuotes, normalizeMaqaf} from "./hebrew";
+import {FixRTLOptions, InternalFixRTLOptions} from "./types/FixRTLOptions";
 
 // ─── Main API ────────────────────────────────────────────────────────────────
 
 export type Language = "arabic" | "persian" | "hebrew";
-
-export interface FixRTLOptions {
-    /**
-     * Target language. Controls which digit set is used.
-     * - `"arabic"`  → Arabic-Indic digits ٠١٢٣٤٥٦٧٨٩  (default for Arabic locales)
-     * - `"persian"` → Extended Persian digits ۰۱۲۳۴۵۶۷۸۹  (default)
-     * - `"hebrew"`  → Keeps standard Latin digits (0-9)
-     */
-    lang?: Language;
-    /**
-     * Convert Latin digits to locale-appropriate digits.
-     * @default true
-     */
-    convertDigits?: boolean;
-    /**
-     * Convert LTR punctuation to RTL equivalents.
-     * @default true
-     */
-    convertPunctuation?: boolean;
-    /**
-     * Move trailing ellipsis to the start of the text.
-     * @default true
-     */
-    fixEllipsis?: boolean;
-    /**
-     * Wrap the result with Unicode bidi control characters (RLE/PDF).
-     * Useful for plain-text contexts where CSS `direction` cannot be applied.
-     * @default false
-     */
-    addBidiMarkers?: boolean;
-    /**
-     * Fix reversed parentheses in RTL text.
-     * Inserts invisible LRM (Left-to-Right Mark) or RLM (Right-to-Left Mark)
-     * inside brackets to force correct visual rendering.
-     *
-     * - For Arabic: uses RLM (`\u200F`) for better compatibility
-     * - For Persian/Hebrew/Urdu: uses LRM (`\u200E`)
-     *
-     * @default true
-     */
-    fixBrackets?: boolean;
-
-    /**
-     * Normalize Hebrew typography (Maqaf hyphens, Geresh/Gershayim quotes).
-     * Only applies when lang === "hebrew".
-     *
-     * Note: Final Forms (Sofit) are ALWAYS normalized for Hebrew automatically
-     * because it is 100% safe and deterministic.
-     *
-     * @default false
-     */
-    normalizeHebrewTypography?: boolean;
-
-    /**
-     * Convert Latin decimal dots (.) to the Persian Momayyez (٫) between digits.
-     * Only applies when lang === "persian".
-     * @default false
-     */
-    fixPersianDecimal?: boolean;
-
-    /**
-     * Normalize Arabic Yeh/Kaf to Persian Yeh/Kaf.
-     * Highly recommended for Farsi/Dari text to ensure proper font rendering.
-     * Only applies when lang === "persian".
-     * @default true
-     */
-    normalizePersianChars?: boolean;
-
-      /**
-   * Remove Arabic diacritics (Fatha, Kasra, Damma, etc.).
-   * WARNING: Do not use for Quranic texts or children's books.
-   * Only applies when lang === "persian".
-   * @default false
-   */
-  removeDiacritics?: boolean;
-
-    /**
-     * Convert Arabic Teh Marbuta (ة) to Persian Heh (ه).
-     * Highly recommended for Farsi text.
-     * Only applies when lang === "persian".
-     * @default true
-     */
-    normalizeTehMarbuta?: boolean;
-}
 
 /**
  * Applies all RTL text fixes at once — the main entry point.
@@ -150,15 +67,12 @@ export function fixRTL(
     if (!hasRTL(text)) return text;
 
     // Support legacy string shorthand: fixRTL(text, "arabic")
-    var opts: FixRTLOptions = {};
-    if (typeof options === "string") {
-        opts.lang = options;
-    } else if (options) {
-        opts = options;
-    }
+    var rawOpts = typeof options === "string" ? {lang: options} : options || {};
+
+    // Cast to internal type for easy property access inside the function
+    var opts = rawOpts as InternalFixRTLOptions;
 
     var lang = opts.lang !== undefined ? opts.lang : "persian";
-    var doTypography = opts.normalizeHebrewTypography !== undefined ? opts.normalizeHebrewTypography : false;
     var doDigits = opts.convertDigits !== undefined ? opts.convertDigits : true;
     var doPunctuation =
         opts.convertPunctuation !== undefined ? opts.convertPunctuation : true;
@@ -166,49 +80,58 @@ export function fixRTL(
     var doBidiMarkers =
         opts.addBidiMarkers !== undefined ? opts.addBidiMarkers : false;
     var doFixBrackets = opts.fixBrackets !== undefined ? opts.fixBrackets : true;
-    var doChars = opts.normalizePersianChars !== undefined ? opts.normalizePersianChars : true;
-    var doDecimal = opts.fixPersianDecimal !== undefined ? opts.fixPersianDecimal : false;
+
+    // Persian specific flags
+    var doPersianChars = opts.normalizePersianChars !== undefined ? opts.normalizePersianChars : true;
+    var doPersianDecimal = opts.fixPersianDecimal !== undefined ? opts.fixPersianDecimal : false;
     var doTehMarbuta = opts.normalizeTehMarbuta !== undefined ? opts.normalizeTehMarbuta : true;
     var doDiacritics = opts.removeDiacritics !== undefined ? opts.removeDiacritics : false;
 
+    // Hebrew specific flags
+    var doHebrewTypography = opts.normalizeHebrewTypography !== undefined ? opts.normalizeHebrewTypography : false;
+
     var result = text;
 
+    // ─── General Fixes ─────────────────────────────────────────────────────────
     if (doDigits) {
         if (lang === "arabic") {
             result = toArabicDigits(result);
         } else if (lang === "persian") {
             result = toPersianDigits(result);
         }
-        // If lang === "hebrew", do nothing (keeps standard 0-9 digits)
     }
 
-    if (lang === "hebrew") {
-        result = fixHebrewFinalForms(result);
-
-        if (doTypography) {
-            result = normalizeMaqaf(result);
-            result = normalizeHebrewQuotes(result);
-        }
-    } else {
+    if (doPunctuation && lang !== "hebrew") {
         result = convertPunctuation(result);
-    }
-
-    if (lang === "persian") {
-        if (doChars) { result = normalizePersianChars(result)}
-        if (doDecimal) { result = toPersianDecimal(result)}
-        if (doTehMarbuta) result = normalizeTehMarbuta(result);
-        if (doDiacritics) result = removePersianDiacritics(result);
     }
 
     if (doFixBrackets) {
         result =
             lang === "arabic" ? fixBracketsArabic(result) : fixBrackets(result);
     }
-
     if (doEllipsis) {
         result = moveEllipsis(result);
     }
 
+    // ─── Persian Specific Fixes ────────────────────────────────────────────────
+    if (lang === "persian") {
+        if (doPersianChars) result = normalizePersianChars(result);
+        if (doPersianDecimal) result = toPersianDecimal(result);
+        if (doTehMarbuta) result = normalizeTehMarbuta(result);
+        if (doDiacritics) result = removePersianDiacritics(result);
+    }
+
+    // ─── Hebrew Specific Fixes ─────────────────────────────────────────────────
+    if (lang === "hebrew") {
+        result = fixHebrewFinalForms(result);
+
+        if (doHebrewTypography) {
+            result = normalizeMaqaf(result);
+            result = normalizeHebrewQuotes(result);
+        }
+    }
+
+    // ─── Bidi Markers ──────────────────────────────────────────────────────────
     if (doBidiMarkers) {
         result = wrapRTL(result);
     }
@@ -230,6 +153,8 @@ export {
     wrapRTL,
 } from "./general";
 export {hasHebrew, fixHebrewFinalForms, normalizeMaqaf, normalizeHebrewQuotes} from "./hebrew";
-export {toPersianDigits, normalizePersianChars, toPersianDecimal, normalizeTehMarbuta , removePersianDiacritics} from "./persian";
+export {
+    toPersianDigits, normalizePersianChars, toPersianDecimal, normalizeTehMarbuta, removePersianDiacritics
+} from "./persian";
 
 export default fixRTL;
