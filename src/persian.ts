@@ -43,6 +43,22 @@ export function normalizeTehMarbuta(text: string): string {
   return text.replace(/\u0629/g, '\u0647'); // ة -> ه
 }
 
+
+/**
+ * Removes Arabic diacritics (Harakat / E'rab) from the text.
+ *
+ * Persian rarely uses vowel marks (Fatha, Kasra, Damma, Sukun, etc.).
+ * This strips them out to leave the clean, base text.
+ *
+ * NOTE: Do not use this if you are processing Quranic texts,
+ * classical poetry, or children's books where vowels are required.
+ */
+export function removePersianDiacritics(text: string): string {
+  if (!text) return text;
+  // Matches Fathatan to Sukun, and includes Shadda
+  return text.replace(/[\u064B-\u065F]/g, '');
+}
+
 // ─── Digit Conversion ────────────────────────────────────────────────────────
 
 var PERSIAN_DIGITS: Record<string, string> = {

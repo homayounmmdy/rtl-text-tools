@@ -12,7 +12,13 @@ import {
     moveEllipsis,
     wrapRTL,
 } from "./general";
-import {normalizePersianChars, normalizeTehMarbuta, toPersianDecimal, toPersianDigits} from "./persian";
+import {
+    normalizePersianChars,
+    normalizeTehMarbuta,
+    removePersianDiacritics,
+    toPersianDecimal,
+    toPersianDigits
+} from "./persian";
 import {fixHebrewFinalForms, normalizeHebrewQuotes, normalizeMaqaf} from "./hebrew";
 
 // ─── Main API ────────────────────────────────────────────────────────────────
@@ -86,6 +92,14 @@ export interface FixRTLOptions {
      */
     normalizePersianChars?: boolean;
 
+      /**
+   * Remove Arabic diacritics (Fatha, Kasra, Damma, etc.).
+   * WARNING: Do not use for Quranic texts or children's books.
+   * Only applies when lang === "persian".
+   * @default false
+   */
+  removeDiacritics?: boolean;
+
     /**
      * Convert Arabic Teh Marbuta (ة) to Persian Heh (ه).
      * Highly recommended for Farsi text.
@@ -155,6 +169,7 @@ export function fixRTL(
     var doChars = opts.normalizePersianChars !== undefined ? opts.normalizePersianChars : true;
     var doDecimal = opts.fixPersianDecimal !== undefined ? opts.fixPersianDecimal : false;
     var doTehMarbuta = opts.normalizeTehMarbuta !== undefined ? opts.normalizeTehMarbuta : true;
+    var doDiacritics = opts.removeDiacritics !== undefined ? opts.removeDiacritics : false;
 
     var result = text;
 
@@ -179,13 +194,10 @@ export function fixRTL(
     }
 
     if (lang === "persian") {
-        if (doChars) {
-            result = normalizePersianChars(result);
-        }
-        if (doDecimal) {
-            result = toPersianDecimal(result);
-        }
+        if (doChars) { result = normalizePersianChars(result)}
+        if (doDecimal) { result = toPersianDecimal(result)}
         if (doTehMarbuta) result = normalizeTehMarbuta(result);
+        if (doDiacritics) result = removePersianDiacritics(result);
     }
 
     if (doFixBrackets) {
@@ -218,6 +230,6 @@ export {
     wrapRTL,
 } from "./general";
 export {hasHebrew, fixHebrewFinalForms, normalizeMaqaf, normalizeHebrewQuotes} from "./hebrew";
-export {toPersianDigits, normalizePersianChars, toPersianDecimal, normalizeTehMarbuta} from "./persian";
+export {toPersianDigits, normalizePersianChars, toPersianDecimal, normalizeTehMarbuta , removePersianDiacritics} from "./persian";
 
 export default fixRTL;
