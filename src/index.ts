@@ -207,6 +207,7 @@ export {
 } from "./persian";
 export {
     hasKurdish,
-    hasPashto
+    hasPashto,
+    hasSindhi
 } from './minor-languages'
 export default fixRTL;
