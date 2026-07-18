@@ -3,7 +3,7 @@ import {
   normalizeMaqaf,
   normalizeHebrewQuotes,
   hasHebrew,
-} from '../src/hebrew';
+} from '../src';
 
 // ─── Unicode Constants ───────────────────────────────────────────────────────
 const CHARS = {

@@ -4,7 +4,7 @@ import {
     hasSindhi,
     hasUyghur,
     hasPunjabi,
-} from '../src/minor-languages'; 
+} from '../src';
 
 /**
  * Unified test runner for all RTL language detection functions.

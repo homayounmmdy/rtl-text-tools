@@ -5,7 +5,7 @@ import {
     normalizeArabicYeh,
     expandArabicHonorifics,
     toQuranicBrackets,
-} from '../src/arabic';
+} from '../src';
 
 // ─── Unicode Constants ───────────────────────────────────────────────────────
 const CHARS = {

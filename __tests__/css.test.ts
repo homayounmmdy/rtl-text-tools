@@ -2,7 +2,7 @@
  * @jest-environment jsdom
  */
 
-import {getRTLStyles, getLTRStyles , setDirAttribute} from "../src/css";
+import {getRTLStyles, getLTRStyles , setDirAttribute} from "../src";
 
 describe("getRTLStyles()", () => {
     it('should return the correct style object for RTL layout', () => {})

@@ -10,7 +10,7 @@ import {
     normalizeArabicAlef,
     normalizeArabicYeh,
     toArabicDigits, toQuranicBrackets
-} from "./arabic";
+} from "./languages/arabic";
 import {
     convertPunctuation,
     fixBrackets,
@@ -24,10 +24,10 @@ import {
     removePersianDiacritics,
     toPersianDecimal,
     toPersianDigits
-} from "./persian";
-import {fixHebrewFinalForms, normalizeHebrewQuotes, normalizeMaqaf} from "./hebrew";
+} from "./languages/persian";
+import {fixHebrewFinalForms, normalizeHebrewQuotes, normalizeMaqaf} from "./languages/hebrew";
 import {FixRTLOptions, InternalFixRTLOptions} from "./types/FixRTLOptions";
-import {expandUrduHonorifics, normalizeUrduTehMarbuta, removeUrduDiacritics} from "./urdu";
+import {expandUrduHonorifics, normalizeUrduTehMarbuta, removeUrduDiacritics} from "./languages/urdu";
 
 // ─── Main API ────────────────────────────────────────────────────────────────
 
@@ -189,8 +189,8 @@ export {
     normalizeArabicYeh,
     expandArabicHonorifics,
     toQuranicBrackets
-} from "./arabic";
-export {getLTRStyles, getRTLStyles, setDirAttribute} from "./css";
+} from "./languages/arabic";
+export {getLTRStyles, getRTLStyles, setDirAttribute} from "./languages/css";
 export {
     BIDI,
     convertPunctuation,
@@ -200,16 +200,16 @@ export {
     wrapLTR,
     wrapRTL,
 } from "./general";
-export {hasHebrew, fixHebrewFinalForms, normalizeMaqaf, normalizeHebrewQuotes} from "./hebrew";
-export {hasUrdu, normalizeUrduTehMarbuta, expandUrduHonorifics, removeUrduDiacritics} from "./urdu";
+export {hasHebrew, fixHebrewFinalForms, normalizeMaqaf, normalizeHebrewQuotes} from "./languages/hebrew";
+export {hasUrdu, normalizeUrduTehMarbuta, expandUrduHonorifics, removeUrduDiacritics} from "./languages/urdu";
 export {
     toPersianDigits, normalizePersianChars, toPersianDecimal, normalizeTehMarbuta, removePersianDiacritics
-} from "./persian";
+} from "./languages/persian";
 export {
     hasKurdish,
     hasPashto,
     hasSindhi,
     hasUyghur,
     hasPunjabi
-} from './minor-languages'
+} from './languages/minor-languages'
 export default fixRTL;

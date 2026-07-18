@@ -4,7 +4,7 @@ import {
     normalizeTehMarbuta,
     removePersianDiacritics,
     toPersianDigits,
-} from '../src/persian';
+} from '../src';
 
 // ─── Unicode Constants ───────────────────────────────────────────────────────
 const CHARS = {

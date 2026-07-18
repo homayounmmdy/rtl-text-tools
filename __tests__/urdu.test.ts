@@ -1,4 +1,4 @@
-import {expandUrduHonorifics, hasUrdu, normalizeUrduTehMarbuta, removeUrduDiacritics} from "../src/urdu";
+import {expandUrduHonorifics, hasUrdu, normalizeUrduTehMarbuta, removeUrduDiacritics} from "../src";
 
 // ─── Unicode Constants ───────────────────────────────────────────────────────
 

@@ -6,7 +6,7 @@ import {
     moveEllipsis,
     wrapLTR,
     wrapRTL,
-} from '../src/general';
+} from '../src';
 
 // ─── Unicode Constants ───────────────────────────────────────────────────────
 // SENIOR PRACTICE: Abstract "magic characters" into a readable constants object.
