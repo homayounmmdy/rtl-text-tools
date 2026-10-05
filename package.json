@@ -47,6 +47,9 @@
     "quranic",
     "ellipsis"
   ],
+  "engines": {
+    "node": ">=14"
+  },
   "author": {
     "name": "Homayoun Mohammadi",
     "email": "homayoun763@gmail.com",
