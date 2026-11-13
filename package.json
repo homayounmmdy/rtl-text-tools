@@ -15,7 +15,9 @@
       "import": "./dist/mcp-server.js"
     }
   },
-  "sideEffects": ["./dist/mcp-server.js"],
+  "sideEffects": [
+    "./dist/mcp-server.js"
+  ],
   "scripts": {
     "build": "rimraf dist && tsc",
     "test": "npm run build && jest",
@@ -89,9 +91,10 @@
     "LICENSE"
   ],
   "bin": {
-    "rtl-text-tools-mcp": "./dist/mcp-server.js"
+    "rtl-text-tools-mcp": "./dist/bin.js"
   },
   "dependencies": {
+    "@modelcontextprotocol/client": "^2.4.0",
     "@modelcontextprotocol/server": "^2.4.0",
     "zod": "^4.6.7"
   }

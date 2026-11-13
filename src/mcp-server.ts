@@ -41,7 +41,7 @@ import {
 
 // ─── Server Factory ───────────────────────────────────────────────────────────
 
-function createServer(): McpServer {
+export function createServer(): McpServer {
   const server = new McpServer({
     name: "rtl-text-tools",
     version: "1.2.0", 
@@ -373,8 +373,3 @@ function createServer(): McpServer {
 
   return server;
 }
-
-// ─── Start the server ────────────────────────────────────────────────────────
-
-serveStdio(createServer);
-console.error("rtl-text-tools MCP server running on stdio");
