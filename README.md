@@ -3,11 +3,10 @@
 [![npm version](https://badge.fury.io/js/rtl-text-tools.svg)](https://www.npmjs.com/package/rtl-text-tools)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![npm downloads](https://img.shields.io/npm/dt/rtl-text-tools.svg)](https://www.npmjs.com/package/rtl-text-tools)
-[![Coverage](https://img.shields.io/badge/coverage-99%25-brightgreen.svg)](./test)
 
 A complete text processing toolkit for RTL (Right-to-Left) languages. Fix ellipsis, punctuation, digit conversion, brackets, bidi wrapping, and CSS helpers for Arabic, Hebrew, Persian, Urdu, and other RTL scripts.
 
-Works back to **IE11** with zero runtime dependencies. Fully tested and optimized for maximum browser compatibility.
+Zero runtime dependencies. Fully tested . Ships with a **built-in Model Context Protocol (MCP) server** for AI agents (Claude Code, Cursor, VS Code).
 
 ## 📜 Features
 
@@ -22,7 +21,7 @@ Works back to **IE11** with zero runtime dependencies. Fully tested and optimize
 - ✅ **CSS & DOM Helpers** — Ready-to-use style objects and attribute setters
 - ✅ **Advanced Text Normalization** — Language-specific normalizers for Persian, Arabic, Hebrew, and Urdu (diacritics, honorifics, final forms, etc.)
 - ✅ **Enhanced DX** — Strict TypeScript intellisense based on the selected language
-- ✅ **99% Test Coverage** — Comprehensive test coverage maintained for all new features
+- ✅ **Built-in MCP Server** — Exposes all 19 utilities as Model Context Protocol tools for AI agents (Claude Code, Cursor, VS Code, etc.)
 
 ## 🚀 Installation
 
@@ -159,6 +158,30 @@ import { setDirAttribute } from 'rtl-text-tools';
 
 setDirAttribute(document.getElementById('article'), 'ar');
 // → <div id="article" dir="rtl" lang="ar">
+```
+
+## 🤖 MCP Server (AI Agents)
+
+`rtl-text-tools` ships with a built-in [Model Context Protocol](https://modelcontextprotocol.io/) server (`rtl-text-tools-mcp`) that exposes all **19 core utilities** as MCP tools. AI agents and IDEs — **Claude Code**, **Cursor**, **VS Code** (via Continue/Cline), and any MCP‑compatible client — can call them directly.
+
+### Requirements
+
+- **Node.js 20+**
+- An MCP‑compatible client
+
+### Configuration
+
+Add the server to your MCP client config. **Claude Code / Claude Desktop (`claude_desktop_config.json`)** and **Cursor / VS Code (`mcp.json`)** share the same shape:
+
+```json
+{
+  "mcpServers": {
+    "rtl-text-tools": {
+      "command": "npx",
+      "args": ["-y", "rtl-text-tools-mcp"]
+    }
+  }
+}
 ```
 
 ## 🔧 API
@@ -316,19 +339,6 @@ Sets `dir="rtl"` and the given `lang` attribute on any element.
 - Samaritan
 - Mandaic
 
-## 🖥️ Browser Compatibility
-
-| Browser | Version |
-|---------|---------|
-| Chrome | 4+ |
-| Firefox | 3.5+ |
-| Safari | 4+ |
-| Edge | 12+ |
-| **IE** | **11+** |
-| iOS Safari | 3.2+ |
-| Android WebView | 2.1+ |
-
-The compiled output targets ES5: `var`, regular functions, no arrow functions, no `const/let`. All regex uses plain `\uXXXX` BMP escapes the ES6 `u` flag is never used. `String.replaceAll()` is never used. Further optimized in v1.1.0 for maximum legacy browser compatibility.
 
 ## 🔄 Changelog
 
