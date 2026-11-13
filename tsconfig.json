@@ -1,8 +1,7 @@
 {
   "compilerOptions": {
-    "target": "es5",
-    "ignoreDeprecations": "5.0",
-    "module": "commonjs",
+    "module": "esnext",
+    "ignoreDeprecations": "6.0",
     "lib": ["es5", "es2015.core", "es2015.iterable", "dom"],
     "declaration": true,
     "outDir": "./dist",

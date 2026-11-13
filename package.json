@@ -7,17 +7,22 @@
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "default": "./dist/index.js"
+      "import": "./dist/index.js",
+      "require": "./dist/index.js"
+    },
+    "./mcp": {
+      "types": "./dist/mcp-server.d.ts",
+      "import": "./dist/mcp-server.js"
     }
   },
-  "sideEffects": false,
+  "sideEffects": ["./dist/mcp-server.js"],
   "scripts": {
     "build": "rimraf dist && tsc",
-    "test": "jest",
+    "test": "npm run build && jest",
     "test:coverage": "jest --coverage",
     "test:watch": "jest --watch",
     "prepare": "npm run build",
-    "prepublishOnly": "npm test && npm run build"
+    "prepublishOnly": "npm run build && npm test"
   },
   "keywords": [
     "rtl",
@@ -47,9 +52,6 @@
     "quranic",
     "ellipsis"
   ],
-  "engines": {
-    "node": ">=14"
-  },
   "author": {
     "name": "Homayoun Mohammadi",
     "email": "homayoun763@gmail.com",
@@ -67,11 +69,13 @@
   "devDependencies": {
     "@types/jest": "^30.0.0",
     "@types/node": "^26.1.1",
+    "@typescript/native": "npm:typescript@^7.0.2",
     "jest": "^30.4.2",
     "jest-environment-jsdom": "^30.4.1",
+    "mcp-jest": "^1.2.1",
     "rimraf": "^6.1.3",
     "ts-jest": "^29.4.11",
-    "typescript": "^7.0.2"
+    "typescript": "npm:@typescript/typescript6@^6.0.2"
   },
   "publishConfig": {
     "access": "public"
@@ -83,5 +87,12 @@
     "CONTRIBUTING.md",
     "README.md",
     "LICENSE"
-  ]
+  ],
+  "bin": {
+    "rtl-text-tools-mcp": "./dist/mcp-server.js"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/server": "^2.4.0",
+    "zod": "^4.6.7"
+  }
 }
